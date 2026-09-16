@@ -1,0 +1,31 @@
+[size=4][b]EXALTED Terminal 77 — an offline Bible reader & study deck inside Cyberpunk 2077[/b][/size]
+
+The King James Bible, fully local, in Night City. A CET mod:
+
+[list]
+[*][b]EXALTED TERMINAL[/b] — full-screen CRT terminal: browse any book/chapter with the Words of Christ in red, full-text search, spaced-repetition memory deck, study notes.
+[*][b]Hyperkey-first[/b] — [b]TAB[/b] cycles the focus panels (BOOKS → VERSES → SEARCH → MEMORY → NOTES → ABOUT), and each panel is navigable with the arrow keys: books up/down + Enter to open, verses up/down verse / left/right chapter / PgUp/PgDn / HOME/END, search & notes up/down + Enter to open, memory SPACE reveal + A/H/G/E grade. 1-5 keys also jump straight to a tab. Open the CET Overlay and the terminal becomes fully interactive (cursor + clicks + keys) on a see-through glass pane whose opacity you can dial from the About tab (25-95%, saved).
+[/list]
+
+[b]Fully offline, pure Lua[/b]
+No network, no host process. The public-domain KJV (1611 / Oxford 1769 text) is bundled as JSON right in the mod folder and read directly by CET. Notes, memory cards, and your bookmark live only in that isolated game copy — your desktop Bible collection is never touched.
+
+[b]Requirements[/b]
+[list]
+[*]Cyberpunk 2077 2.x
+[*]Cyber Engine Tweaks 1.27+
+[*]No external binary — works on any OS
+[/list]
+
+[b]Install[/b]
+[list=1]
+[*]Extract the zip into the Cyberpunk 2077 folder (standard CET game-structure layout).
+[*]In-game: CET Overlay → Bindings → bind a key for [i]Open EXALTED Terminal[/i].
+[*]Press your key to show the terminal; press the CET Overlay key to interact (CET hands mouse/keyboard to mod UI only while its overlay is open).
+[/list]
+
+[b]Credits / License[/b]
+Bible text: King James Version 1611/1769, [i]public domain[/i] (Project Gutenberg; Crosswire/eBible.org) — no copyrighted modern-spelling edition is used. Cyber Engine Tweaks and Dear ImGui (both MIT) are used through their public APIs only; no framework source is bundled. All other code (Lua mod, exporter, scripts) is original. Full provenance: [b]docs/CREDITS.md[/b].
+
+[b]Source[/b]
+[url=https://github.com/Gigatone77]Gigatone77[/url]

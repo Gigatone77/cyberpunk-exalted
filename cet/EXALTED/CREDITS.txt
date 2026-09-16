@@ -1,0 +1,20 @@
+EXALTED Terminal 77 — Saturday credits for the mod build.
+
+BIBLE TEXT
+  King James Version (Authorized Version) 1611 / Oxford 1769 standard text.
+  PUBLIC DOMAIN outside the UK printing patent.
+  Sources: Project Gutenberg eBooks #10 / #10900, Crosswire / eBible.org.
+  No copyrighted modern-spelling edition is used; text seeded from the
+  desktop EXALTED engine's bundled public-domain 1769 protocanon (66 books).
+
+FRAMEWORKS (APIs only; no source included)
+  Cyber Engine Tweaks  — MIT (github.com/maximegmd/CyberEngineTweaks)
+  Dear ImGui           — MIT (github.com/ocornut/imgui), exposed via CET
+
+ORIGINAL CODE
+  CET Lua mod (pure Lua data layer + terminal UI), install/packaging
+  scripts, and the USFM->JSON exporter (Go): all original, authored for
+  this project. Engine derived from the same author's desktop EXALTED
+  Terminal project.
+
+Full notes: docs/CREDITS.md

@@ -1,0 +1,18 @@
+# Example systemd user unit for the EXALTED bridge.
+# Paths use %h (HOME) so the file is relocation-safe on any machine.
+# Installed for real by scripts/install-bridge-service.sh, which substitutes
+# the actual mod folder path. This copy ships as documentation/reference.
+
+[Unit]
+Description=EXALTED Terminal bridge (CP2077 CET mod IPC host)
+After=graphical-session.target
+
+[Service]
+Type=simple
+ExecStart=%h/Games/Cyberpunk 2077/bin/x64/plugins/cyber_engine_tweaks/mods/EXALTED/bin/exalted bridge --dir "%h/Games/Cyberpunk 2077/bin/x64/plugins/cyber_engine_tweaks/mods/EXALTED" --interval 150
+Restart=on-failure
+RestartSec=2
+Nice=5
+
+[Install]
+WantedBy=default.target

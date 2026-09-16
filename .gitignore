@@ -1,0 +1,19 @@
+# Build artifacts
+bin/
+dist/
+
+# Python / editors
+__pycache__/
+*.pyc
+*.egg-info/
+*.swp
+.DS_Store
+
+# CET runtime artifacts (mod folder, generated at launch)
+*.log
+db.sqlite3
+exalted_settings.json
+exalted_bookmark.json
+exalted_notes.json
+exalted_notes_trash.json
+exalted_memory.json
