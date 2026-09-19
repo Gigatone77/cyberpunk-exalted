@@ -14,22 +14,10 @@ theme.green     = 0xFFf5a623 -- tAccent (amber accent / highlights)
 theme.greenDim  = 0xFF8b949e -- tMuted
 theme.greenMid  = 0xFF1f6feb -- tSel   (selection blue)
 theme.greenFaint= 0xFF484f58 -- tDim
-theme.sky       = 0xFF3fb950 -- tOk green (unused links)
 theme.amber     = 0xFFf5a623 -- tAccent warning / status
 theme.red       = 0xFFf85149 -- tWarn errors
 theme.white     = 0xFFffd479 -- tAccentHi bright headers
 theme.base      = 0xFFe6edf3 -- tFg main text
-
--- Gold datapad palette used by the BOOK surface.
-function theme.palette_gold()
-    theme.green = 0xFFFFD98A
-    theme.greenDim  = 0xFFC9A74F
-    theme.greenMid  = 0xFF8A6D2A
-    theme.greenFaint= 0xFF6B5520
-    theme.border    = 0xFF3A2E0F
-end
-
--- Restore the dark TUI palette used by the TERMINAL surface.
 function theme.palette_crt()
     theme.green = 0xFFf5a623
     theme.greenDim  = 0xFF8b949e
@@ -53,18 +41,6 @@ function theme.withAlpha(color, alpha)
     local a = math.floor((alpha or theme.glass) * 255)
     local rgb = color % 16777216 -- strip the alpha byte
     return rgb + a * 16777216
-end
-
-theme.font     = "Consolas"  -- decorative only; real font is CET's default
-
--- Format a dim terminal header line like "EXALTED TERMINAL 77 v0.1".
-function theme.header(title, version, side)
-    theme.text(title .. "  " .. version, theme.white)
-    if side then
-        ImGui.SameLine()
-        theme.text(side, theme.greenDim)
-    end
-    theme.sep()
 end
 
 function theme.text(text, color, scale)
@@ -97,14 +73,6 @@ function theme.faint(text)
     theme.text(text, theme.greenFaint, 0.8)
 end
 
-function theme.warn(text)
-    theme.text(text, theme.amber, 0.95)
-end
-
-function theme.err(text)
-    theme.text(text, theme.red, 0.95)
-end
-
 function theme.sep()
     ImGui.PushStyleColor(ImGuiCol.Separator, theme.border)
     ImGui.Spacing()
@@ -127,12 +95,54 @@ function theme.panelEnd()
     if theme._depth > 0 then theme._depth = theme._depth - 1 end
 end
 
+-- Mouse-only click detection. Button()/Selectable() return true on mouse
+-- RELEASE (and on keyboard Enter/Space when focused), while
+-- IsItemClicked() is true on mouse PRESS. Returning IsItemClicked() keeps
+-- every widget mouse-only: keyboard can never fire a button, and the click
+-- registers on press. Must be called immediately after the widget.
+local function mouseClicked()
+    return ImGui.IsItemClicked(ImGuiMouseButton.Left)
+end
+
+-- EXALTED runs its OWN keyboard navigation, and only for the books rail and
+-- reading panel. ImGui's built-in keyboard/gamepad nav must be silenced on our
+-- clickable widgets, otherwise arrow keys independently move ImGui's nav
+-- highlight (and can activate) the top tab bar and the lists. Existence-guarded
+-- so a missing binding can never break the mod.
+local ITEM_NO_NAV = nil
+if ImGuiItemFlags then
+    ITEM_NO_NAV = ImGuiItemFlags.NoNav or ImGuiItemFlags.NoNavInputs or ImGuiItemFlags.NoNavFocus
+end
+
+local function navPush()
+    if ITEM_NO_NAV ~= nil and type(ImGui.PushItemFlag) == "function" then
+        ImGui.PushItemFlag(ITEM_NO_NAV, true)
+        return "item"
+    end
+    if type(ImGui.PushAllowKeyboardFocus) == "function" then
+        ImGui.PushAllowKeyboardFocus(false)
+        return "focus"
+    end
+    return nil
+end
+
+local function navPop(tag)
+    if tag == "item" and type(ImGui.PopItemFlag) == "function" then
+        ImGui.PopItemFlag()
+    elseif tag == "focus" and type(ImGui.PopAllowKeyboardFocus) == "function" then
+        ImGui.PopAllowKeyboardFocus()
+    end
+end
+
 function theme.button(label)
     ImGui.PushStyleColor(ImGuiCol.Button, theme.panel)
     ImGui.PushStyleColor(ImGuiCol.ButtonHovered, theme.greenMid)
     ImGui.PushStyleColor(ImGuiCol.ButtonActive, theme.border)
     ImGui.PushStyleColor(ImGuiCol.Text, theme.green)
-    local clicked = ImGui.Button(label)
+    local nav = navPush()
+    ImGui.Button(label)
+    local clicked = mouseClicked()
+    navPop(nav)
     ImGui.PopStyleColor(4)
     return clicked
 end
@@ -142,7 +152,10 @@ function theme.buttonDim(label)
     ImGui.PushStyleColor(ImGuiCol.ButtonHovered, theme.border)
     ImGui.PushStyleColor(ImGuiCol.ButtonActive, theme.border)
     ImGui.PushStyleColor(ImGuiCol.Text, theme.greenDim)
-    local clicked = ImGui.Button(label)
+    local nav = navPush()
+    ImGui.Button(label)
+    local clicked = mouseClicked()
+    navPop(nav)
     ImGui.PopStyleColor(4)
     return clicked
 end
@@ -152,7 +165,10 @@ function theme.selectable(label, selected)
     ImGui.PushStyleColor(ImGuiCol.Text, selected and theme.base or theme.greenDim)
     ImGui.PushStyleColor(ImGuiCol.Header, theme.greenMid)
     ImGui.PushStyleColor(ImGuiCol.HeaderHovered, theme.border)
-    local clicked = ImGui.Selectable(label, selected)
+    local nav = navPush()
+    ImGui.Selectable(label, selected)
+    local clicked = mouseClicked()
+    navPop(nav)
     ImGui.PopStyleColor(3)
     return clicked
 end
@@ -164,20 +180,11 @@ function theme.input(label, current, maxlen)
     ImGui.PushStyleColor(ImGuiCol.FrameBgHovered, theme.bg)
     ImGui.PushStyleColor(ImGuiCol.FrameBgActive, theme.bg)
     ImGui.PushStyleColor(ImGuiCol.Text, theme.base)
+    local nav = navPush()
     local text, _ = ImGui.InputTextWithHint(label, ">_", current, maxlen)
+    navPop(nav)
     ImGui.PopStyleColor(4)
     return text
-end
-
--- Push a styling block: returns a func that pops it. Canadian Usage:
--- local pop = theme.scrim(); ... ; pop()
-function theme.scrim()
-    ImGui.PushStyleColor(ImGuiCol.WindowBg, theme.bg)
-    ImGui.PushStyleColor(ImGuiCol.Border, theme.border)
-    ImGui.PushStyleColor(ImGuiCol.FrameBg, theme.bg)
-    return function()
-        ImGui.PopStyleColor(3)
-    end
 end
 
 -- Bottom status line.

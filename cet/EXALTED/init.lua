@@ -26,6 +26,8 @@ end)
 
 registerForEvent("onInit", function()
     cache.init()
+    -- Release any freeze channel left behind by a mid-game script reload.
+    terminal.clearFreeze()
 end)
 
 -- CET routes mouse/keyboard into mod ImGui only while the overlay is open
@@ -40,6 +42,10 @@ registerForEvent("onOverlayClose", function()
     terminal.onOverlayClose()
 end)
 
+registerForEvent("onShutdown", function()
+    terminal.clearFreeze()
+end)
+
 registerForEvent("onDraw", function()
     cache.poll(os.clock()) -- steps the search-index preloader (books decode)
     if terminal.visible then
@@ -49,5 +55,5 @@ end)
 
 return {
     name = "EXALTED",
-    version = "0.1.1",
+    version = "0.1.3",
 }

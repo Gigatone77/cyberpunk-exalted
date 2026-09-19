@@ -24,8 +24,11 @@ local M = {
     status = "INITIALIZING...",
     overlayOpen = false,
     suppressAuto = false,
+    focusRequest = false,
     settingsLoaded = false,
     glass = 45,
+    freeze = false,   -- opt-in: freeze the world while the terminal is interactive
+    freezeOn = false, -- whether the EXALTED time-dilation channel is currently set
     focus = 2,        -- 1 BOOKS  2 VERSES  3 SEARCH  4 MEMORY  5 NOTES  6 ABOUT
     bookCursor = 0,   -- books rail highlight (0 = follow current book)
     resultSel = 0,    -- search result highlight
@@ -67,12 +70,60 @@ local F_BOOKS, F_VERSES, F_SEARCH, F_MEMORY, F_NOTES, F_ABOUT = 1, 2, 3, 4, 5, 6
 local PANEL_TAB = { [F_BOOKS] = TAB_BROWSE, [F_VERSES] = TAB_BROWSE, [F_SEARCH] = TAB_SEARCH,
     [F_MEMORY] = TAB_MEMORY, [F_NOTES] = TAB_NOTES, [F_ABOUT] = TAB_ABOUT }
 
+-- FREEZE (opt-in) ----------------------------------------------------------
+-- The terminal cannot stop the game receiving clicks/keys (CET's input trap
+-- leaks under Proton), so "freeze" pins the world instead: while the terminal
+-- is interactive we hold a dedicated time-dilation channel at ~0, so the game
+-- still gets the input but nothing acts on it. Sandevistan and any other mod
+-- use their own channels, so ours never clobbers them. Released on close,
+-- overlay-close, script reload and shutdown.
+local FREEZE_CHANNEL = "EXALTED_TERMINAL"
+local FREEZE_VALUE = 0.0
+
+local function freezeTimeSystem()
+    local ok, ts = pcall(Game.GetTimeSystem)
+    if ok and ts then return ts end
+    return nil
+end
+
+function M.applyFreeze()
+    local ts = freezeTimeSystem()
+    if not ts then return end
+    pcall(function() ts:SetTimeDilation(FREEZE_CHANNEL, FREEZE_VALUE) end)
+end
+
+function M.clearFreeze()
+    local ts = freezeTimeSystem()
+    if ts then pcall(function() ts:UnsetTimeDilation(FREEZE_CHANNEL) end) end
+    M.freezeOn = false
+end
+
+-- Freeze only while the player can actually mouse around (overlay open), so a
+-- read-only terminal left on screen never freezes Night City.
+local function freezeSync()
+    local want = (M.freeze and M.visible and M.overlayOpen) and true or false
+    if want == M.freezeOn then return end
+    if want then
+        M.freezeOn = true
+        M.applyFreeze()
+    else
+        M.clearFreeze()
+    end
+end
+
+function M.setFreeze(on)
+    M.freeze = on and true or false
+    cache.setSetting("freeze", M.freeze)
+    freezeSync()
+end
+
 function M.toggle()
     M.visible = not M.visible
     if M.visible then
         M.suppressAuto = false
         M.open()
     end
+    freezeSync()
 end
 
 function M.onOverlayOpen()
@@ -83,11 +134,13 @@ function M.onOverlayOpen()
         M.visible = true
         M.open()
     end
+    freezeSync()
 end
 
 function M.onOverlayClose()
     M.overlayOpen = false
     M.suppressAuto = false
+    M.clearFreeze()
 end
 
 function M.setGlass(pct)
@@ -97,10 +150,12 @@ function M.setGlass(pct)
 end
 
 function M.open()
+    M.focusRequest = true
     if not M.settingsLoaded then
         M.settingsLoaded = true
         local g = cache.getSetting("glass", 45)
         M.setGlass(tonumber(g) or 45)
+        M.freeze = cache.getSetting("freeze", false) and true or false
     end
     cache.boot(function(data)
         M.booted = true
@@ -196,9 +251,23 @@ function bookStep(dir)
 end
 
 local function chapterStep(dir)
-    if dir < 0 and M.chapter > 1 then M.gotoBook(M.book, M.chapter - 1, true) end
-    if dir > 0 and (M.totalChapters == 0 or M.chapter < M.totalChapters) then
-        M.gotoBook(M.book, M.chapter + 1, true)
+    local i = 0
+    for k, b in ipairs(M.books) do
+        if b.n == M.book then i = k break end
+    end
+    if dir < 0 then
+        if M.chapter > 1 then
+            M.gotoBook(M.book, M.chapter - 1, true)
+        elseif i > 1 then
+            local prev = M.books[i - 1]
+            M.gotoBook(prev.n, prev.chapters, true)
+        end
+    elseif dir > 0 then
+        if M.totalChapters == 0 or M.chapter < M.totalChapters then
+            M.gotoBook(M.book, M.chapter + 1, true)
+        elseif i < #M.books then
+            M.gotoBook(M.books[i + 1].n, 1, true)
+        end
     end
 end
 
@@ -248,40 +317,38 @@ local function currentBookIdx()
     return 1
 end
 
--- Tab cycles the panel ring; arrows navigate within the focused panel.
+-- Top bar is number-key only: 1 BROWSE · 2 SEARCH · 3 MEMORY · 4 NOTES ·
+-- 5 ABOUT. Arrow keys are reserved for the two browse surfaces (books rail +
+-- reading panel); TAB toggles focus between them and always returns to BROWSE.
 local function navGlobal()
     if typing() then return end
-    if ImGui.IsKeyPressed(KEY.Tab) then
-        local shift = ImGui.IsKeyDown(KEY.LeftShift) or ImGui.IsKeyDown(KEY.RightShift)
-        if shift then
-            M.focus = M.focus <= 1 and F_ABOUT or M.focus - 1
-        else
-            M.focus = M.focus >= F_ABOUT and F_BOOKS or M.focus + 1
-        end
-        focusPanel(M.focus)
-        return
-    end
     for i = 1, 5 do
         if ImGui.IsKeyPressed(KEY[tostring(i)]) then
-            local target = M.focus
             if i == 1 then
-                -- BROWSE: keep whichever browse panel (books/verses) is focused
-            elseif i == 2 then target = F_SEARCH
-            elseif i == 3 then target = F_MEMORY
-            elseif i == 4 then target = F_NOTES
-            elseif i == 5 then target = F_ABOUT
+                M.focus = (M.focus == F_BOOKS or M.focus == F_VERSES) and M.focus or F_VERSES
+                M.tab = TAB_BROWSE
+            elseif i == 2 then
+                focusPanel(F_SEARCH)
+            elseif i == 3 then
+                focusPanel(F_MEMORY)
+            elseif i == 4 then
+                focusPanel(F_NOTES)
+            elseif i == 5 then
+                focusPanel(F_ABOUT)
             end
-            focusPanel(target)
         end
+    end
+    if ImGui.IsKeyPressed(KEY.Tab) then
+        M.focus = (M.focus == F_BOOKS) and F_VERSES or F_BOOKS
+        M.tab = TAB_BROWSE
     end
 end
 
--- Per-panel arrow navigation. Only dispatched when that panel is focused.
+-- Per-panel arrow navigation. Only the books rail and the reading panel take
+-- arrows; every other surface is pointer-driven.
 local function navPanel()
     if typing() then return end
-    if M.focus ~= F_SEARCH and M.focus ~= F_NOTES and M.focus ~= F_MEMORY and not M.data then
-        return
-    end
+    if M.focus ~= F_BOOKS and M.focus ~= F_VERSES then return end
 
     if M.focus == F_BOOKS then
         local count = #M.books
@@ -301,9 +368,6 @@ local function navPanel()
                 M.focus = F_VERSES
             end
             return
-        end
-        if ImGui.IsKeyPressed(KEY.LeftArrow) then
-            M.focus = F_VERSES
         end
         return
     end
@@ -340,45 +404,6 @@ local function navPanel()
         if ImGui.IsKeyPressed(KEY.End) then M.selectVerse(count) return end
         return
     end
-
-    if M.focus == F_SEARCH then
-        local count = #M.results
-        if count == 0 then return end
-        if ImGui.IsKeyPressed(KEY.DownArrow, true) then
-            M.resultSel = M.resultSel >= count and count or M.resultSel + 1
-            if M.resultSel == 0 then M.resultSel = 1 end
-            return
-        end
-        if ImGui.IsKeyPressed(KEY.UpArrow, true) then
-            M.resultSel = M.resultSel <= 1 and 1 or M.resultSel - 1
-            return
-        end
-        if ImGui.IsKeyPressed(KEY.Enter) then
-            local r = M.results[M.resultSel == 0 and 1 or M.resultSel]
-            if r then jumpToRef(r.book, r.chapter, r.verse, r.bookname) end
-        end
-        return
-    end
-
-    if M.focus == F_NOTES then
-        local count = #M.notes
-        if count == 0 then return end
-        if ImGui.IsKeyPressed(KEY.DownArrow, true) then
-            M.noteSel = M.noteSel >= count and 1 or M.noteSel + 1
-            return
-        end
-        if ImGui.IsKeyPressed(KEY.UpArrow, true) then
-            M.noteSel = M.noteSel <= 1 and count or M.noteSel - 1
-            return
-        end
-        if ImGui.IsKeyPressed(KEY.Enter) then
-            local n = M.notes[M.noteSel == 0 and 1 or M.noteSel]
-            if n then
-                local b, c = parseBookChapter(n.ref)
-                if b and c then jumpToRef(b, c, n.verse or 1, n.ref:match("%S+"):lower():gsub("^%l", string.upper) or "") end
-            end
-        end
-    end
 end
 
 -- ---------------------------------------------------------------------------
@@ -390,18 +415,35 @@ function M.draw()
     theme.palette_crt()
     theme.glass = M.glass / 100
     cache.poll(os.clock())
+    freezeSync()
     navGlobal()
 
     local w, h = res()
-    ImGui.SetNextWindowPos(0, 0, ImGuiCond.Always)
-    ImGui.SetNextWindowSize(w, h, ImGuiCond.Always)
+    -- Resizable, centred, 80% by default (FirstUseEver = the player's own
+    -- drag size persists; the lower-right grip and window edges resize).
+    local winW, winH = math.floor(w * 0.8), math.floor(h * 0.8)
+    ImGui.SetNextWindowPos(math.floor((w - winW) / 2), math.floor((h - winH) / 2), ImGuiCond.FirstUseEver)
+    ImGui.SetNextWindowSize(winW, winH, ImGuiCond.FirstUseEver)
+    ImGui.SetNextWindowSizeConstraints(640, 400, w, h)
     ImGui.PushStyleColor(ImGuiCol.WindowBg, theme.withAlpha(theme.bg, theme.glass))
     ImGui.PushStyleColor(ImGuiCol.Border, theme.withAlpha(theme.border, math.min(1, theme.glass + 0.15)))
     ImGui.PushStyleColor(ImGuiCol.FrameBg, theme.withAlpha(theme.bg, math.min(1, theme.glass + 0.05)))
     ImGui.PushStyleColor(ImGuiCol.FrameBgHovered, theme.withAlpha(theme.bg, math.min(1, theme.glass + 0.10)))
     ImGui.PushStyleColor(ImGuiCol.FrameBgActive, theme.withAlpha(theme.bg, math.min(1, theme.glass + 0.10)))
     ImGui.PushStyleColor(ImGuiCol.PopupBg, theme.withAlpha(theme.bg, 0.95))
-    if ImGui.Begin("##EXALTED_TERMINAL", ImGuiWindowFlags.NoTitleBar + ImGuiWindowFlags.NoResize + ImGuiWindowFlags.NoMove) then
+    ImGui.PushStyleVar(ImGuiStyleVar.WindowBorderSize, 1)
+    -- Our own arrow nav (books rail + reading panel) is the only keyboard nav
+    -- we want; NoNavInputs/NoNavFocus stop ImGui's built-in nav from moving its
+    -- highlight across the tab bar and lists by itself.
+    local noNav = (ImGuiWindowFlags.NoNavInputs or 0) + (ImGuiWindowFlags.NoNavFocus or 0)
+    -- Standard ImGui title bar: draggable to move, and the window resizes from
+    -- every edge/corner (NoResize is NOT set). Raise it above other overlay
+    -- windows whenever it is (re)opened so its buttons own the mouse.
+    if M.focusRequest then
+        ImGui.SetNextWindowFocus()
+        M.focusRequest = false
+    end
+    if ImGui.Begin("EXALTED TERMINAL 77##exalted", ImGuiWindowFlags.NoCollapse + noNav) then
         drawHeader()
         drawTabs()
         navPanel()
@@ -413,13 +455,16 @@ function M.draw()
         drawStatus()
     end
     ImGui.End()
+    ImGui.PopStyleVar()
     ImGui.PopStyleColor(6)
 end
 
 function drawHeader()
-    local side = M.overlayOpen and "TAB CYCLE · ARROWS NAVIGATE" or "OPEN CET OVERLAY TO INTERACT (KEYS)"
-    theme.header("EXALTED TERMINAL 77", "v0.1.1", side)
-    ImGui.Spacing()
+    local side = M.overlayOpen and "1-5 TABS · ARROWS IN BROWSE" or "OPEN CET OVERLAY TO INTERACT (KEYS)"
+    theme.text("v0.1.3", theme.white)
+    ImGui.SameLine()
+    theme.text(side, theme.greenDim)
+    theme.sep()
 end
 
 function drawTabs()
@@ -427,16 +472,24 @@ function drawTabs()
     for i, label in ipairs(labels) do
         if i == 6 then
             ImGui.SameLine()
-            if theme.button(label) and ImGui.IsItemClicked(ImGuiMouseButton.Left) then
+            if theme.button(label) then
                 M.visible = false
             end
         else
             if i > 1 then ImGui.SameLine() end
-            if theme.selectable(label, M.tab == i) and ImGui.IsItemClicked(ImGuiMouseButton.Left) then
-                M.tab = i
-                if i == TAB_SEARCH then refreshSearch() end
-                if i == TAB_NOTES then refreshNotes() end
-                if i == TAB_MEMORY then refreshMemory() end
+            if theme.selectable(label, M.tab == i) then
+                if i == TAB_BROWSE then
+                    M.focus = (M.focus == F_BOOKS or M.focus == F_VERSES) and M.focus or F_VERSES
+                    M.tab = TAB_BROWSE
+                elseif i == TAB_SEARCH then
+                    focusPanel(F_SEARCH)
+                elseif i == TAB_MEMORY then
+                    focusPanel(F_MEMORY)
+                elseif i == TAB_NOTES then
+                    focusPanel(F_NOTES)
+                elseif i == TAB_ABOUT then
+                    focusPanel(F_ABOUT)
+                end
             end
         end
     end
@@ -453,12 +506,13 @@ function drawBrowse()
     theme.panelBegin("##br_books", 230, -1)
     for _, b in ipairs(M.books) do
         local hasCursor = (M.focus == F_BOOKS and b.n == M.book) or (M.focus == F_BOOKS and b.n == (M.books[currentBookIdx()] or {}).n)
-        if theme.selectable(b.name, hasCursor) and ImGui.IsItemClicked(ImGuiMouseButton.Left) then
+        if theme.selectable(b.name, hasCursor) then
             M.gotoBook(b.n, 1, true)
+            M.focus = F_VERSES
         end
     end
     if M.focus ~= F_BOOKS then
-        theme.faint("TAB to books panel")
+        theme.faint("TAB to books rail")
     else
         theme.faint("UP/DN book · ENTER open")
     end
@@ -493,11 +547,11 @@ function drawChapterHeader()
     ImGui.SameLine()
     -- chapter buttons are MOUSE-ONLY: Enter/Space on a focused ImGui button
     -- can re-trigger a chapter step and look like a flicker backward.
-    if theme.buttonDim("<") and ImGui.IsItemClicked(ImGuiMouseButton.Left) then chapterStep(-1) end
+    if theme.buttonDim("<") then chapterStep(-1) end
     ImGui.SameLine()
     theme.text(" CHAPTER " .. tostring(M.chapter) .. " / " .. tostring(M.totalChapters), theme.greenDim, 0.9)
     ImGui.SameLine()
-    if theme.buttonDim(">") and ImGui.IsItemClicked(ImGuiMouseButton.Left) then chapterStep(1) end
+    if theme.buttonDim(">") then chapterStep(1) end
     theme.sep()
     -- busy marker while the new chapter payload is loading
     if d and (d.chapter or 0) ~= M.chapter then
@@ -515,9 +569,9 @@ function drawChapterHeader()
     M.jumpChap = theme.input("##jc", M.jumpChap, 4)
     if ImGui.IsItemDeactivatedAfterEdit() then doJump() end
     ImGui.SameLine()
-    if theme.button("GO") and ImGui.IsItemClicked(ImGuiMouseButton.Left) then doJump() end
+    if theme.button("GO") then doJump() end
     ImGui.SameLine()
-    theme.faint("  <-  ->  chapter · TAB next panel")
+    theme.faint("  <-  ->  chapter")
     theme.sep()
 end
 
@@ -536,7 +590,7 @@ function drawVerses()
             ImGui.SetScrollHereY(0.5)
         end
         -- verse number selectable gives the row's hit area + selection tint
-        if theme.selectable(string.format("%3d", verse.v), M.selVerse == verse.v) and ImGui.IsItemClicked(ImGuiMouseButton.Left) then
+        if theme.selectable(string.format("%3d", verse.v), M.selVerse == verse.v) then
             M.follow = false
             M.selectVerse(verse.v)
         end
@@ -565,13 +619,13 @@ function drawVerseActionBar()
     theme.sep()
     theme.dim("SELECTED :: " .. M.selRef)
     ImGui.SameLine()
-    if theme.button("MEMORIZE") and ImGui.IsItemClicked(ImGuiMouseButton.Left) then
+    if theme.button("MEMORIZE") then
         cache.memoryAdd(M.selRef, function(data, err)
             M.status = err and ("MEMORY: " .. err) or ("ADDED TO DECK: " .. (data and data.ref or M.selRef))
         end)
     end
     ImGui.SameLine()
-    if theme.button("NEW NOTE") and ImGui.IsItemClicked(ImGuiMouseButton.Left) then
+    if theme.button("NEW NOTE") then
         M.newNoteBody = ""
         M.noteFor = M.selRef
     end
@@ -580,7 +634,7 @@ function drawVerseActionBar()
         theme.faint("NOTE FOR " .. M.noteFor)
         M.newNoteBody = theme.input("##note_body", M.newNoteBody, 500)
         ImGui.SameLine()
-        if theme.button("SAVE") and M.newNoteBody ~= "" and ImGui.IsItemClicked(ImGuiMouseButton.Left) then
+        if theme.button("SAVE") and M.newNoteBody ~= "" then
             local ref = M.noteFor
             cache.noteAdd(ref, M.newNoteBody, function(_, err)
                 M.status = err and ("NOTE: " .. err) or ("NOTE SAVED — " .. ref)
@@ -589,7 +643,7 @@ function drawVerseActionBar()
             end)
         end
         ImGui.SameLine()
-        if theme.buttonDim("CANCEL") and ImGui.IsItemClicked(ImGuiMouseButton.Left) then
+        if theme.buttonDim("CANCEL") then
             M.noteFor = nil
         end
     end
@@ -609,11 +663,11 @@ function drawSearch()
         refreshSearch()
     end
     ImGui.SameLine()
-    if theme.button("SEARCH") and ImGui.IsItemClicked(ImGuiMouseButton.Left) then
+    if theme.button("SEARCH") then
         refreshSearch()
     end
     ImGui.SameLine()
-    if theme.buttonDim("CLEAR") and ImGui.IsItemClicked(ImGuiMouseButton.Left) then
+    if theme.buttonDim("CLEAR") then
         M.query = ""
         M.searched = ""
         M.results = {}
@@ -636,14 +690,14 @@ function drawSearch()
     for i, r in ipairs(M.results) do
         local label = string.format("%s %d:%d  —  %s", r.bookname, r.chapter, r.verse, r.text or "")
         local isSel = (M.focus == F_SEARCH and i == M.resultSel)
-        if theme.selectable(label:sub(1, 110), isSel) and ImGui.IsItemClicked(ImGuiMouseButton.Left) then
+        if theme.selectable(label:sub(1, 110), isSel) then
             M.focus = F_SEARCH
             M.resultSel = i
             jumpToRef(r.book, r.chapter, r.verse, r.bookname)
         end
     end
     if M.focus == F_SEARCH then
-        theme.faint("UP/DN result · ENTER open · TAB next panel")
+        theme.faint("CLICK a result to open it")
     end
     theme.panelEnd()
     theme.panelEnd()
@@ -685,7 +739,7 @@ function M.suggestions()
         theme.faint("DID YOU MEAN?")
         for i, wd in ipairs(words) do
             ImGui.SameLine()
-            if theme.buttonDim(wd) and ImGui.IsItemClicked(ImGuiMouseButton.Left) then
+            if theme.buttonDim(wd) then
                 M.query = wd
                 M.searched = ""
                 refreshSearch()
@@ -718,12 +772,12 @@ function drawMemory()
     end
     theme.dim(string.format("DECK %d  ·  DUE %d  ·  LEARNING %d  ·  REVIEW %d",
         M.stats.total, M.stats.due, M.stats.learning, M.stats.review))
-    if theme.buttonDim("REFRESH") and ImGui.IsItemClicked(ImGuiMouseButton.Left) then
+    if theme.buttonDim("REFRESH") then
         refreshMemory()
     end
     ImGui.SameLine()
     if M.shown and #M.cards > 0 then
-        if theme.button("NEXT") and ImGui.IsItemClicked(ImGuiMouseButton.Left) then
+        if theme.button("NEXT") then
             advanceCard()
         end
     end
@@ -745,17 +799,17 @@ function drawMemory()
             ImGui.Spacing()
             theme.dim("GRADE:")
             ImGui.SameLine()
-            if theme.button("A AGAIN") and ImGui.IsItemClicked(ImGuiMouseButton.Left) then gradeCard(0) end
+            if theme.button("A AGAIN") then gradeCard(0) end
             ImGui.SameLine()
-            if theme.buttonDim("H HARD") and ImGui.IsItemClicked(ImGuiMouseButton.Left) then gradeCard(3) end
+            if theme.buttonDim("H HARD") then gradeCard(3) end
             ImGui.SameLine()
-            if theme.buttonDim("G GOOD") and ImGui.IsItemClicked(ImGuiMouseButton.Left) then gradeCard(4) end
+            if theme.buttonDim("G GOOD") then gradeCard(4) end
             ImGui.SameLine()
-            if theme.buttonDim("E EASY") and ImGui.IsItemClicked(ImGuiMouseButton.Left) then gradeCard(5) end
+            if theme.buttonDim("E EASY") then gradeCard(5) end
         else
             theme.faint("(hidden)  ")
             ImGui.SameLine()
-            if theme.button("REVEAL") and ImGui.IsItemClicked(ImGuiMouseButton.Left) then
+            if theme.button("REVEAL") then
                 M.shown = true
             end
         end
@@ -802,7 +856,7 @@ function drawNotes()
     theme.faint("NOTE BODY")
     M.newNoteBody = theme.input("##nt_body", M.newNoteBody, 500)
     ImGui.SameLine()
-    if theme.button("ADD") and M.newNoteRef ~= "" and M.newNoteBody ~= "" and ImGui.IsItemClicked(ImGuiMouseButton.Left) then
+    if theme.button("ADD") and M.newNoteRef ~= "" and M.newNoteBody ~= "" then
         local ref = M.newNoteRef
         cache.noteAdd(ref, M.newNoteBody, function(_, err)
             M.status = err and ("NOTE: " .. err) or ("NOTE SAVED — " .. ref)
@@ -821,7 +875,7 @@ function drawNotes()
     theme.panelBegin("##nt_list", -1, -1)
     for i, n in ipairs(M.notes) do
         local isSel = (M.focus == F_NOTES and i == M.noteSel)
-        if theme.selectable(n.ref, isSel) and ImGui.IsItemClicked(ImGuiMouseButton.Left) then
+        if theme.selectable(n.ref, isSel) then
             M.focus = F_NOTES
             M.noteSel = i
             local b, c = parseBookChapter(n.ref)
@@ -830,7 +884,7 @@ function drawNotes()
             end
         end
         ImGui.SameLine()
-        if theme.buttonDim("DEL") and ImGui.IsItemClicked(ImGuiMouseButton.Left) then
+        if theme.buttonDim("DEL") then
             cache.noteRemove(n.ref, function(_, err)
                 M.status = err and ("NOTE: " .. err) or ("NOTE TRASHED — " .. n.ref)
                 refreshNotes()
@@ -839,7 +893,7 @@ function drawNotes()
         theme.textWrapped("     " .. (n.body or ""), theme.greenDim, 0.95)
     end
     if M.focus == F_NOTES then
-        theme.faint("UP/DN note · ENTER open · TAB next panel")
+        theme.faint("CLICK a note to open it")
     end
     theme.panelEnd()
     theme.panelEnd()
@@ -873,20 +927,29 @@ function drawAbout()
     theme.sep()
     theme.dim("DISPLAY — GLASS (SEE-THROUGH)")
     ImGui.SameLine()
-    if theme.buttonDim("-") and ImGui.IsItemClicked(ImGuiMouseButton.Left) then M.setGlass(M.glass - 5) end
+    if theme.buttonDim("-") then M.setGlass(M.glass - 5) end
     ImGui.SameLine()
     theme.text(string.format("%3d%%", M.glass), theme.white, 0.9)
     ImGui.SameLine()
-    if theme.buttonDim("+") and ImGui.IsItemClicked(ImGuiMouseButton.Left) then M.setGlass(M.glass + 5) end
+    if theme.buttonDim("+") then M.setGlass(M.glass + 5) end
     ImGui.SameLine()
-    if theme.buttonDim("RESET") and ImGui.IsItemClicked(ImGuiMouseButton.Left) then M.setGlass(45) end
+    if theme.buttonDim("RESET") then M.setGlass(45) end
     theme.faint("lower = more of Night City shows through the terminal")
     theme.sep()
-    theme.faint("KEYS    TAB cycle panels · arrows within the focused panel")
+    theme.dim("WORLD — FREEZE WHILE TERMINAL IS INTERACTIVE")
+    ImGui.SameLine()
+    if theme.buttonDim(M.freeze and " ON " or " OFF") then M.setFreeze(not M.freeze) end
+    theme.faint("on = pin world time so stray clicks/keys cannot act on V")
+    theme.faint("     (EXALTED-only time-dilation channel; released when you close)")
+    theme.sep()
+    theme.faint("RESIZE  drag the lower-right corner or any window edge")
+    theme.sep()
+    theme.faint("KEYS    1-5 switch the top bar (BROWSE · SEARCH · MEMORY · NOTES · ABOUT)")
+    theme.faint("        TAB toggles BOOKS <-> VERSES · arrows work in those two only:")
     theme.faint("        BOOKS: UP/DN book, ENTER open · VERSES: UP/DN verse,")
-    theme.faint("        <- -> chapter, PgUp/PgDn ±10, HOME/END · SEARCH/NOTES:")
-    theme.faint("        UP/DN item, ENTER open")
-    theme.faint("        1..5 tabs · (MEMORY) SPACE reveal, A/H/G/E grade")
+    theme.faint("        <- -> chapter, PgUp/PgDn ±10, HOME/END")
+    theme.faint("        SEARCH/MEMORY/NOTES are pointer-driven (click an item)")
+    theme.faint("        (MEMORY) SPACE reveal, A/H/G/E grade")
     theme.faint("OPEN CET OVERLAY to mouse around (cursor + clicks appear there)")
     theme.faint("HOTKEY   assign in CET Overlay -> Bindings -> EXALTED")
     theme.faint("DATA     fully local KJV seeded in the mod folder (no network)")
@@ -899,7 +962,7 @@ end
 function drawStatus()
     local panel = { [F_BOOKS] = "BOOKS", [F_VERSES] = "VERSES", [F_SEARCH] = "SEARCH",
         [F_MEMORY] = "MEMORY", [F_NOTES] = "NOTES", [F_ABOUT] = "ABOUT" }
-    local hint = "FOCUS: " .. (panel[M.focus] or "?") .. " · TAB cycle panels · arrows navigate · 1-5 tabs"
+    local hint = "FOCUS: " .. (panel[M.focus] or "?") .. " · 1-5 tabs · TAB books<->verses · arrows in BROWSE"
     if M.overlayOpen then hint = hint .. " · MOUSE LIVE" end
     theme.statusbar(hint, M.status, M.booted and "READY" or "BOOTING")
 end
