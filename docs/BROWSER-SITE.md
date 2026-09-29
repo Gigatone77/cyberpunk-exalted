@@ -8,8 +8,8 @@ browser. No CET, no Lua.
 
 ## Install
 
-Unzip `EXALTED_Terminal_77-Browser-0.1.0.zip` (or the unified
-`EXALTED_Terminal_77-0.1.3.zip`) into the game root — it lands at
+Unzip `EXALTED_Terminal_77-Browser-0.1.1.zip` (or the unified
+`EXALTED_Terminal_77-0.1.4.zip`) into the game root — it lands at
 `r6/scripts/EXALTED/`. Requires the Browser Extension Framework already
 installed (`r6/scripts/BrowserExtension/`). Redscript compiles on game
 launch (full game restart required, not just reload).
