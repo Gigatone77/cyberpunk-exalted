@@ -12,6 +12,7 @@ No file I/O is available to redscript, so the text ships as script constants.
 """
 import json
 import os
+import re
 import sys
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
@@ -24,6 +25,21 @@ VERSE_SEP = "{|}"  # verse separator inside a chapter literal
 LINE_SEP = "{~}"   # line separator inside a verse
 RED_OPEN = "{r}"
 RED_CLOSE = "{/r}"
+
+# KJV margin/cross-reference apparatus, e.g. "+ 8.6 drawn: Heb. pulled" or
+# "+ 1.20 Mara: that is, Bitter", is baked into the source text as one or more
+# trailing runs. It is translator's apparatus, NOT scripture — drop every run
+# so the in-game reader never renders it as body text.
+MARGIN_RUN = re.compile(r"\+ \d+\.\d+ ")
+
+
+def strip_margins(text):
+    """Remove trailing KJV margin-note runs (keeps everything before the first
+    "+ <chap>.<verse> " marker; source data files are never modified)."""
+    m = MARGIN_RUN.search(text)
+    if not m:
+        return text
+    return text[: m.start()]
 
 
 def esc(s):
@@ -50,12 +66,14 @@ def verse_lines(verse, wrap):
         words = []
         for s in segs:
             red = bool(s.get("r"))
-            check_bad(s["t"])
-            for w in s["t"].split():
+            st = strip_margins(s["t"])
+            check_bad(st)
+            for w in st.split():
                 words.append((red, w))
     else:
-        check_bad(verse["text"])
-        words = [(False, w) for w in verse["text"].split()]
+        st = strip_margins(verse["text"])
+        check_bad(st)
+        words = [(False, w) for w in st.split()]
     if not words:
         return (num, [])
 
