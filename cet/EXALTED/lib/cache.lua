@@ -119,10 +119,38 @@ function M.getBooks(cb)
     return out
 end
 
+local function strip_margins(text)
+    -- Drop trailing KJV margin/cross-reference apparatus ("+ 8.6 drawn: Heb.
+    -- pulled", "+ 1.20 Mara: that is, Bitter") that rides on verse text. The
+    -- generator applies the same strip to the browser data; mirror it here so
+    -- the terminal never renders margin notes as body text. Source files
+    -- (data/kjv/*.json) are never modified; the strip happens on the decoded
+    -- copy only.
+    if type(text) ~= "string" then return text end
+    local s, e = text:find("%+ %d+%.%d+ ")
+    if s then return text:sub(1, s - 1) end
+    return text
+end
+
 local function loadBook(ord)
     if M.booksData[ord] then return M.booksData[ord] end
     local t = jsonRead("data/kjv/" .. tostring(ord) .. ".json")
-    if type(t) ~= "table" then t = nil end
+    if type(t) == "table" then
+        for _, verses in pairs(t) do
+            for _, v in ipairs(verses or {}) do
+                if v and type(v) == "table" then
+                    if v.text then v.text = strip_margins(v.text) end
+                    if v.segs then
+                        for _, seg in ipairs(v.segs) do
+                            if seg and seg.t then seg.t = strip_margins(seg.t) end
+                        end
+                    end
+                end
+            end
+        end
+    else
+        t = nil
+    end
     M.booksData[ord] = t
     return t
 end
