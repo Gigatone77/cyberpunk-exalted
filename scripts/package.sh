@@ -4,12 +4,12 @@
 # Nexus mods. Pure Lua + pure redscript: data ships inside, no host binary.
 #
 # Produces three zips:
-#   EXALTED_Terminal_77-0.1.3.zip        — UNIFIED (CET + browser site)
-#   EXALTED_Terminal_77-CET-0.1.3.zip    — CET surface only
-#   EXALTED_Terminal_77-Browser-0.1.0.zip — in-game browser site only
+#   EXALTED_Terminal_77-0.1.5.zip        — UNIFIED (CET + browser site)
+#   EXALTED_Terminal_77-CET-0.1.5.zip    — CET surface only
+#   EXALTED_Terminal_77-Browser-0.1.2.zip — in-game browser site only
 #
 # Version overrides via env: EXALTED_VERSION (CET, default from init.lua),
-# EXALTED_BROWSER_VERSION (browser site, default 0.1.0).
+# EXALTED_BROWSER_VERSION (browser site, default 0.1.2).
 set -euo pipefail
 
 REPO="$(cd "$(dirname "$0")/.." && pwd)"
@@ -18,8 +18,8 @@ STAGE="$(mktemp -d)"
 trap 'rm -rf "$STAGE"' EXIT
 
 CET_VERSION="${EXALTED_VERSION:-$(sed -n 's/^[[:space:]]*version[[:space:]]*=[[:space:]]*"\([0-9.]*\)".*/\1/p' "$REPO/cet/EXALTED/init.lua" | head -n1)}"
-CET_VERSION="${CET_VERSION:-0.1.3}"
-BROWSER_VERSION="${EXALTED_BROWSER_VERSION:-0.1.0}"
+CET_VERSION="${CET_VERSION:-0.1.5}"
+BROWSER_VERSION="${EXALTED_BROWSER_VERSION:-0.1.2}"
 
 CET_ZIP="EXALTED_Terminal_77-${CET_VERSION}.zip"
 CET_ONLY_ZIP="EXALTED_Terminal_77-CET-${CET_VERSION}.zip"

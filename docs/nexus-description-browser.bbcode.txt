@@ -1,0 +1,53 @@
+[font=Verdana][size=4][b]EXALTED TERMINAL 77 — the King James Bible on Night City's own web[/b][/size][/font]
+
+[font=Verdana][size=3]The whole Bible, readable inside the [i]Cyberpunk 2077 in-game browser[/i]. Power on any computer with a browser app, open the site list, choose [b]Exalted Terminal 77[/b] — or just type the address:[/size][/font]
+
+[center][font=Consolas][size=4][code]NETdir://exalted.terminal[/code][/size][/font][/center]
+
+[font=Verdana][size=3][list]
+[*][b]The entire canon, offline[/b] — 66 books / 1189 chapters / 31102 verses, baked into redscript data modules and compiled by the game itself. No network, no host process, no external binary, works on any OS.
+[*][b]Red-letter text[/b] — the words of Jesus are set in red, verse numbers dimmed, in the browser's own CRT palette.
+[*][b]Clean text[/b] — the source's cross-reference apparatus and section markers are stripped at generation time, so no translator's notes or stray glyphs ever reach the page.
+[*][b]Real site navigation[/b] — pages are built from actual in-game browser widgets, so links, hover states and paging behave like any other site in Night City.
+[/list][/size][/font]
+
+[font=Verdana][size=4][b]Where to go[/b][/size][/font]
+[font=Verdana][size=3][list]
+[*][b]Home[/b] — title page and entry point to the library
+[*][b]Library[/b] — all 66 books, 8 per page
+[*][b]Book page[/b] — that book's chapter list, 10 per page
+[*][b]Reader[/b] — 10 lines per page, with chapter paging plus previous/next chapter, [i]CHAPTERS[/i] and [i]HOME[/i] in the footer
+[*][b]About[/b] — version and provenance, in-game
+[/list][/size][/font]
+
+[font=Verdana][size=4][b]Requirements[/b][/size][/font]
+[font=Verdana][size=3][list]
+[*]Cyberpunk 2077 [b]2.x[/b]
+[*][b]Browser Extension Framework[/b] — [url=https://www.nexusmods.com/cyberpunk2077/mods/10038]Nexus mod 10038[/url] (0.9.7+). This is the framework that lets a mod register a custom [i]NETdir://[/i] site into the vanilla browser. Without it the site simply is not listed — the file still compiles, so you get no errors, just no page.
+[*]The framework's own prerequisites: [b]redscript[/b], [b]RED4ext[/b], [b]Codeware[/b] (and optionally [b]Mod Settings[/b], which adds an in-game toggle for the framework).
+[*][b]Cyber Engine Tweaks is NOT required[/b] — this surface is pure redscript. No Lua, no ImGui, no CET overlay.
+[/list][/size][/font]
+
+[font=Verdana][size=4][b]Install[/b][/size][/font]
+[font=Verdana][size=3][list=1]
+[*]Unzip [b]EXALTED_Terminal_77-Browser-0.1.2.zip[/b] (or the unified [b]EXALTED_Terminal_77-0.1.5.zip[/b]) into your Cyberpunk 2077 folder. It lands at [code]r6/scripts/EXALTED/[/code].
+[*][b]Fully restart the game[/b] — not just reload. Redscript compiles on launch; a script reload is not enough for a new site.
+[*]In-game: power on any computer, open a browser, pick [b]Exalted Terminal 77[/b] from the homepage, or type [code]NETdir://exalted.terminal[/code] into the address bar.
+[/list][/size][/font]
+
+[font=Verdana][size=4][b]Troubleshooting[/b][/size][/font]
+[font=Verdana][size=3][list]
+[*]Site missing from the list → Browser Extension Framework not installed, or the game was not fully restarted after installing.
+[*]Game will not start / redscript errors → open [code]Cyberpunk 2077\r6\logs\redscript_rCURRENT.log[/code]. Script compilation errors are almost always a framework or Codeware version that is out of date for your game patch, not a fault in this mod.
+[/list][/size][/font]
+
+[font=Verdana][size=4][b]Changelog[/b][/size][/font]
+[font=Verdana][size=3][list]
+[*][b]0.1.2[/b] — text cleanup: the USFM section marker ("¶") that prefixed 2970 verses across 42 books, and the 369 dangling colons left behind by removed cross-reference notes, are now stripped from the generated data. 0.1.1 and earlier rendered both.
+[*][b]0.1.1[/b] — reader pagination and layout pass.
+[/list][/size][/font]
+
+[font=Verdana][size=4][b]Credits / License[/b][/size][/font]
+[font=Verdana][size=3]Bible text: King James Version 1611 / Oxford 1769 — [i]public domain[/i] (Project Gutenberg; Crosswire/eBible.org). No copyrighted modern-spelling edition is used, and nothing is downloaded at run time. Browser Extension Framework (r457 & gh057), RED4ext, Codeware, redscript and Mod Settings are used only through their public APIs — no framework source is bundled. All other code (the redscript site, the data generator, the exporter, scripts and docs) is original. Full provenance: [b]docs/CREDITS.md[/b].[/size][/font]
+
+[font=Verdana][size=3][b]Source[/b] — [url=https://github.com/Gigatone77]Gigatone77[/url][/size][/font]

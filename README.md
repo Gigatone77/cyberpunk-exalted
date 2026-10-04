@@ -41,13 +41,13 @@ cd Games/biblelearn && ./cmd/bibleexport -out ../../cyberpunk-exalted/cet/EXALTE
 cd cyberpunk-exalted && python3 scripts/gen-exalted-reds.py
 
 # 3) Package — three Nexus-style zips in dist/:
-#      EXALTED_Terminal_77-0.1.4.zip         (CET + browser, unified)
-#      EXALTED_Terminal_77-CET-0.1.4.zip     (CET surface only)
-#      EXALTED_Terminal_77-Browser-0.1.1.zip (browser site only)
+#      EXALTED_Terminal_77-0.1.5.zip         (CET + browser, unified)
+#      EXALTED_Terminal_77-CET-0.1.5.zip     (CET surface only)
+#      EXALTED_Terminal_77-Browser-0.1.2.zip (browser site only)
 cd cyberpunk-exalted && ./scripts/package.sh
 
 # 4) Install: extract the unified zip into the game root
-unzip dist/EXALTED_Terminal_77-0.1.4.zip -d ~/Games/Cyberpunk\ 2077/
+unzip dist/EXALTED_Terminal_77-0.1.5.zip -d ~/Games/Cyberpunk\ 2077/
 ```
 
 Browser framework note: the browser site needs **Cyberpunk 2077 Browser

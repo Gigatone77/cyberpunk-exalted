@@ -53,7 +53,12 @@ string literals. Encoding inside a chapter string:
   the largest at 15789 chars — fine for redscript's `String`)
 
 All delimiters are checked at generation: any literal `{`, `}`, `~` in the
-source would collide, so the generator rejects the source if found.
+source would collide, so the generator rejects the source if found. `¶` is
+checked too — `strip_margins()` owns that glyph (USFM section marker, 2970
+verses across 42 books) plus the dangling colon left by a removed margin note,
+and any survivor fails generation rather than shipping. `strip_margins()` is
+mirrored in `cet/EXALTED/lib/cache.lua` for the CET surface; the two must stay
+byte-identical in behaviour (verified over all 31828 corpus segments).
 
 ## Site routes
 
@@ -63,9 +68,9 @@ source would collide, so the generator rejects the source if found.
 |---|---|
 | `/`            | home (name, counts, links) |
 | `/about`       | about box |
-| `/books[/<pg>]`| 66-book paginated list, 20/page |
-| `/b/<short>[/<pg>]` | chapter list for a book, 24/page |
-| `/r/<short>/<ch>:<vp>` | reader, 10 verses/page (vp = verse page, 0-based) |
+| `/books[/<pg>]`| 66-book paginated list, 8/page (`EXAL_BOOKS_PER_PAGE`) |
+| `/b/<short>[/<pg>]` | chapter list for a book, 10/page (`EXAL_CHAPS_PER_PAGE`) |
+| `/r/<short>/<ch>:<vp>` | reader, 10 **lines**/page (`linesPerPage`), not verses (vp = page, 0-based) |
 
 > Reader sizing uses **static values** (Sep 18): 10 rows/page, body font 42,
 > verse numbers 40, page sub 44, nav links 40 — fills more of the width (76-char

@@ -126,10 +126,29 @@ local function strip_margins(text)
     -- the terminal never renders margin notes as body text. Source files
     -- (data/kjv/*.json) are never modified; the strip happens on the decoded
     -- copy only.
+    --
+    -- Also drops two apparatus leftovers found by scanning all 66 books:
+    --   1. a leading pilcrow (the USFM section marker, e.g. "¶ And God said")
+    --      -- 2970 verses across 42 books; never mid-verse, always leading;
+    --   2. the dangling colon the removed note used to sit behind ("...side of
+    --      the altar:+ 1.15 wring..." -> "...side of the altar") -- only when a
+    --      note was actually removed, so the 1924 verses that legitimately end
+    --      in a colon keep it.
     if type(text) ~= "string" then return text end
-    local s, e = text:find("%+ %d+%.%d+ ")
-    if s then return text:sub(1, s - 1) end
-    return text
+    local out = text
+    -- A single gsub only eats one pilcrow run and Lua patterns will not repeat
+    -- a group here, so loop until it stops matching.
+    while true do
+        local stripped, n = out:gsub("^%s*¶%s*", "")
+        if n == 0 then break end
+        out = stripped
+    end
+    local s, e = out:find("%+ %d+%.%d+ ")
+    if s then
+        out = out:sub(1, s - 1)
+        out = out:gsub("%s*:%s*$", "")
+    end
+    return out
 end
 
 local function loadBook(ord)

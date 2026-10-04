@@ -32,14 +32,26 @@ RED_CLOSE = "{/r}"
 # so the in-game reader never renders it as body text.
 MARGIN_RUN = re.compile(r"\+ \d+\.\d+ ")
 
+# USFM section marker. The Crosswire source prefixes a verse with "¶ " to mark
+# a poetic/section break; it is an encoding artifact, not scripture, and it used
+# to render as a stray pilcrow at the top of the line in-game (2970 verses
+# across 42 of the 66 books). Only ever leading — verified on the whole corpus.
+PILCROW = re.compile(r"^(?:\s*¶\s*)+")
+
 
 def strip_margins(text):
     """Remove trailing KJV margin-note runs (keeps everything before the first
-    "+ <chap>.<verse> " marker; source data files are never modified)."""
-    m = MARGIN_RUN.search(text)
+    "+ <chap>.<verse> " marker) plus the two leftovers of that apparatus: a
+    leading pilcrow and the dangling colon the note used to sit behind. Source
+    data files are never modified."""
+    out = PILCROW.sub("", text)
+    m = MARGIN_RUN.search(out)
     if not m:
-        return text
-    return text[: m.start()]
+        return out
+    body = out[: m.start()]
+    # The colon only dangles because the note it introduced was just removed;
+    # verses that end in a colon on their own keep it.
+    return re.sub(r"\s*:\s*$", "", body)
 
 
 def esc(s):
@@ -47,7 +59,9 @@ def esc(s):
 
 
 def check_bad(text):
-    for tok in ("{", "}", "~"):
+    # "¶" is asserted too: strip_margins owns it, so any survivor is a bug and
+    # must fail generation rather than ship as a stray glyph.
+    for tok in ("{", "}", "~", "¶"):
         if tok in text:
             raise SystemExit(f"source text contains forbidden token {tok!r}: {text[:120]!r}")
 
