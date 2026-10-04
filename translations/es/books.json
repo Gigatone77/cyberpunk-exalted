@@ -1,0 +1,464 @@
+[
+ {
+  "n": 1,
+  "name": "Génesis",
+  "short": "Gen",
+  "chapters": 50,
+  "verses": 1533
+ },
+ {
+  "n": 2,
+  "name": "Éxodo",
+  "short": "Ex",
+  "chapters": 40,
+  "verses": 1213
+ },
+ {
+  "n": 3,
+  "name": "Levítico",
+  "short": "Lev",
+  "chapters": 27,
+  "verses": 859
+ },
+ {
+  "n": 4,
+  "name": "Números",
+  "short": "Num",
+  "chapters": 36,
+  "verses": 1288
+ },
+ {
+  "n": 5,
+  "name": "Deuteronomio",
+  "short": "Deut",
+  "chapters": 34,
+  "verses": 959
+ },
+ {
+  "n": 6,
+  "name": "Josué",
+  "short": "Josh",
+  "chapters": 24,
+  "verses": 658
+ },
+ {
+  "n": 7,
+  "name": "Jueces",
+  "short": "Judg",
+  "chapters": 21,
+  "verses": 618
+ },
+ {
+  "n": 8,
+  "name": "Rut",
+  "short": "Ruth",
+  "chapters": 4,
+  "verses": 85
+ },
+ {
+  "n": 9,
+  "name": "1 Samuel",
+  "short": "1Sam",
+  "chapters": 31,
+  "verses": 810
+ },
+ {
+  "n": 10,
+  "name": "2 Samuel",
+  "short": "2Sam",
+  "chapters": 24,
+  "verses": 695
+ },
+ {
+  "n": 11,
+  "name": "1 Reyes",
+  "short": "1Kgs",
+  "chapters": 22,
+  "verses": 816
+ },
+ {
+  "n": 12,
+  "name": "2 Reyes",
+  "short": "2Kgs",
+  "chapters": 25,
+  "verses": 719
+ },
+ {
+  "n": 13,
+  "name": "1 Crónicas",
+  "short": "1Chr",
+  "chapters": 29,
+  "verses": 942
+ },
+ {
+  "n": 14,
+  "name": "2 Crónicas",
+  "short": "2Chr",
+  "chapters": 36,
+  "verses": 822
+ },
+ {
+  "n": 15,
+  "name": "Esdras",
+  "short": "Ezra",
+  "chapters": 10,
+  "verses": 280
+ },
+ {
+  "n": 16,
+  "name": "Nehemías",
+  "short": "Neh",
+  "chapters": 13,
+  "verses": 406
+ },
+ {
+  "n": 17,
+  "name": "Ester",
+  "short": "Esth",
+  "chapters": 10,
+  "verses": 167
+ },
+ {
+  "n": 18,
+  "name": "Job",
+  "short": "Job",
+  "chapters": 42,
+  "verses": 1070
+ },
+ {
+  "n": 19,
+  "name": "Salmos",
+  "short": "Ps",
+  "chapters": 150,
+  "verses": 2461
+ },
+ {
+  "n": 20,
+  "name": "Proverbios",
+  "short": "Prov",
+  "chapters": 31,
+  "verses": 915
+ },
+ {
+  "n": 21,
+  "name": "Eclesiastés",
+  "short": "Eccl",
+  "chapters": 12,
+  "verses": 222
+ },
+ {
+  "n": 22,
+  "name": "Cantar de los Cantares",
+  "short": "Song",
+  "chapters": 8,
+  "verses": 117
+ },
+ {
+  "n": 23,
+  "name": "Isaías",
+  "short": "Isa",
+  "chapters": 66,
+  "verses": 1292
+ },
+ {
+  "n": 24,
+  "name": "Jeremías",
+  "short": "Jer",
+  "chapters": 52,
+  "verses": 1364
+ },
+ {
+  "n": 25,
+  "name": "Lamentaciones",
+  "short": "Lam",
+  "chapters": 5,
+  "verses": 154
+ },
+ {
+  "n": 26,
+  "name": "Ezequiel",
+  "short": "Ezek",
+  "chapters": 48,
+  "verses": 1273
+ },
+ {
+  "n": 27,
+  "name": "Daniel",
+  "short": "Dan",
+  "chapters": 12,
+  "verses": 357
+ },
+ {
+  "n": 28,
+  "name": "Oseas",
+  "short": "Hos",
+  "chapters": 14,
+  "verses": 197
+ },
+ {
+  "n": 29,
+  "name": "Joel",
+  "short": "Joel",
+  "chapters": 3,
+  "verses": 73
+ },
+ {
+  "n": 30,
+  "name": "Amós",
+  "short": "Amos",
+  "chapters": 9,
+  "verses": 146
+ },
+ {
+  "n": 31,
+  "name": "Abdías",
+  "short": "Obad",
+  "chapters": 1,
+  "verses": 21
+ },
+ {
+  "n": 32,
+  "name": "Jonás",
+  "short": "Jonah",
+  "chapters": 4,
+  "verses": 48
+ },
+ {
+  "n": 33,
+  "name": "Miqueas",
+  "short": "Mic",
+  "chapters": 7,
+  "verses": 105
+ },
+ {
+  "n": 34,
+  "name": "Nahum",
+  "short": "Nah",
+  "chapters": 3,
+  "verses": 47
+ },
+ {
+  "n": 35,
+  "name": "Habacuc",
+  "short": "Hab",
+  "chapters": 3,
+  "verses": 56
+ },
+ {
+  "n": 36,
+  "name": "Sofonías",
+  "short": "Zeph",
+  "chapters": 3,
+  "verses": 53
+ },
+ {
+  "n": 37,
+  "name": "Hageo",
+  "short": "Hag",
+  "chapters": 2,
+  "verses": 38
+ },
+ {
+  "n": 38,
+  "name": "Zacarías",
+  "short": "Zech",
+  "chapters": 14,
+  "verses": 211
+ },
+ {
+  "n": 39,
+  "name": "Malaquías",
+  "short": "Mal",
+  "chapters": 4,
+  "verses": 55
+ },
+ {
+  "n": 40,
+  "name": "San Mateo",
+  "short": "Matt",
+  "chapters": 28,
+  "verses": 1071
+ },
+ {
+  "n": 41,
+  "name": "Marcos",
+  "short": "Mark",
+  "chapters": 16,
+  "verses": 678
+ },
+ {
+  "n": 42,
+  "name": "San Lucas",
+  "short": "Luke",
+  "chapters": 24,
+  "verses": 1151
+ },
+ {
+  "n": 43,
+  "name": "Juan",
+  "short": "John",
+  "chapters": 21,
+  "verses": 879
+ },
+ {
+  "n": 44,
+  "name": "Hechos",
+  "short": "Acts",
+  "chapters": 28,
+  "verses": 1007
+ },
+ {
+  "n": 45,
+  "name": "Romanos",
+  "short": "Rom",
+  "chapters": 16,
+  "verses": 433
+ },
+ {
+  "n": 46,
+  "name": "1 Corintios",
+  "short": "1Cor",
+  "chapters": 16,
+  "verses": 437
+ },
+ {
+  "n": 47,
+  "name": "2 Corintios",
+  "short": "2Cor",
+  "chapters": 13,
+  "verses": 257
+ },
+ {
+  "n": 48,
+  "name": "Gálatas",
+  "short": "Gal",
+  "chapters": 6,
+  "verses": 149
+ },
+ {
+  "n": 49,
+  "name": "Efesios",
+  "short": "Eph",
+  "chapters": 6,
+  "verses": 155
+ },
+ {
+  "n": 50,
+  "name": "Filipenses",
+  "short": "Phil",
+  "chapters": 4,
+  "verses": 104
+ },
+ {
+  "n": 51,
+  "name": "Colosenses",
+  "short": "Col",
+  "chapters": 4,
+  "verses": 95
+ },
+ {
+  "n": 52,
+  "name": "1 Tesalonicenses",
+  "short": "1Thess",
+  "chapters": 5,
+  "verses": 89
+ },
+ {
+  "n": 53,
+  "name": "2 Tesalonicenses",
+  "short": "2Thess",
+  "chapters": 3,
+  "verses": 47
+ },
+ {
+  "n": 54,
+  "name": "1 Timoteo",
+  "short": "1Tim",
+  "chapters": 6,
+  "verses": 113
+ },
+ {
+  "n": 55,
+  "name": "2 Timoteo",
+  "short": "2Tim",
+  "chapters": 4,
+  "verses": 83
+ },
+ {
+  "n": 56,
+  "name": "Tito",
+  "short": "Titus",
+  "chapters": 3,
+  "verses": 46
+ },
+ {
+  "n": 57,
+  "name": "Filemón",
+  "short": "Philem",
+  "chapters": 1,
+  "verses": 25
+ },
+ {
+  "n": 58,
+  "name": "Hebreos",
+  "short": "Heb",
+  "chapters": 13,
+  "verses": 303
+ },
+ {
+  "n": 59,
+  "name": "Santiago",
+  "short": "Jas",
+  "chapters": 5,
+  "verses": 108
+ },
+ {
+  "n": 60,
+  "name": "1 Pedro",
+  "short": "1Pet",
+  "chapters": 5,
+  "verses": 105
+ },
+ {
+  "n": 61,
+  "name": "2 Pedro",
+  "short": "2Pet",
+  "chapters": 3,
+  "verses": 61
+ },
+ {
+  "n": 62,
+  "name": "1 Juan",
+  "short": "1John",
+  "chapters": 5,
+  "verses": 105
+ },
+ {
+  "n": 63,
+  "name": "2 Juan",
+  "short": "2John",
+  "chapters": 1,
+  "verses": 13
+ },
+ {
+  "n": 64,
+  "name": "3 Juan",
+  "short": "3John",
+  "chapters": 1,
+  "verses": 14
+ },
+ {
+  "n": 65,
+  "name": "Judas",
+  "short": "Jude",
+  "chapters": 1,
+  "verses": 25
+ },
+ {
+  "n": 66,
+  "name": "Apocalipsis",
+  "short": "Rev",
+  "chapters": 22,
+  "verses": 404
+ }
+]
