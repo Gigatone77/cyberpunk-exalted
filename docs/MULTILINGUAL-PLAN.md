@@ -175,7 +175,8 @@ User answer: *"one per language and a multi language. one also."* -> ship **both
   ArchiveXL (option C below). That keeps the compile fast and memory sane.
   This is the single biggest engineering item of the whole project.
 
-**C. Text backend = `.archive` resource instead of `.reds` literals**
+**C. Text backend = `.archive` resource instead of `.reds` literals** — 
+**DEFERRED, and the original premise was wrong. See §5C.1.**
 - Per-language text resource read at page-build time; literals vanish.
 - Same proven mechanism as `pattern.archivexl-resource-replace` already in the
   GigaPunk/GigaData notes: an `.archive` member at a base-game resource path
@@ -185,9 +186,25 @@ User answer: *"one per language and a multi language. one also."* -> ship **both
 ### 5.0 Per-language budget (measured from English)
 | Item | Per language |
 |---|---|
-| browser data | 4.5 MB, 67 files, 1390 string literals |
+| browser data | 4.5 MB, 67 files, **1390 string literals** |
 | canonical JSON source | ~5.6 MB (66 files) |
 | redscript compile | one FULL game restart |
+
+**Correction (Oct 4):** the pack cost above was written as "19 x 4.5 MB = ~85 MB,
+~25k string literals, long redscript compile". That is the *all-19-languages*
+figure and it badly overstates the real pressure, because the encoder emits **one
+literal per chapter, not per verse** (1189 chapters + ~200 names/chapter-counts
+= 1390). Measured cost of the actually-shippable set:
+
+| set | literals | size |
+|---|---|---|
+| en + cze + deu + dut + pol | **6,950** | **21.5 MB** |
+
+6.9k literals is a routine redscript load, so the "must move text out of literals
+at this scale" argument does not apply to the set we can actually ship. The
+archive backend is therefore **deferred, not cancelled** — it becomes worth doing
+only if a real compile problem appears, or when the held languages clear their
+rights/provenance gates and the set grows towards 19.
 
 ### 5.2 UI strings that must also be localized (not just scripture)
 About page, "Books" index header, chapter/verse labels, "Exalted Terminal 77"
@@ -198,6 +215,35 @@ Latin/Cyrillic wrap on spaces; **CJK/Thai wrap on character boundaries**
 (no spaces) — the paging/line-wrap code in `Site.reds` needs a per-language
 break rule. Arabic/Hebrew need RTL base direction + shaping. Currently the
 canvas paging is space-based; this is a real code change, not data.
+
+### 5.3.1 What ArchiveXL can and cannot do (researched Oct 4)
+
+The original §5C assumed ArchiveXL could "read a per-language text resource at
+page-build time". **It cannot.** The actual ArchiveXL redscript surface is:
+
+* `App::Facade::RegisterArchive(path)` / `RegisterDir(path)` — register an
+  archive or resource directory into the game's `ResourceDepot`.
+* `.xl` **resource patching** — a YAML map from a file inside your archive to
+  one or more base-game resource paths (`.ent`, `.app`, `.mesh`, `.json`, …),
+  merged in file terms.
+
+There is **no "read a string out of an archive member" call**, and nothing that
+returns text to a redscript caller. So option C as written is not buildable.
+
+If the archive backend is ever revived, these are the only plausible routes, both
+of which are real projects rather than a refactor:
+
+1. **Carry the text as a game JSON resource** and `LoadResource()` it from
+   redscript. ArchiveXL already registers `.json` resources, and the game loads
+   them through the ordinary depot, so this is the most native option — but it
+   needs a resource class the engine will actually hand to script, and reading
+   a large JSON tree on the UI thread has its own cost.
+2. **Add a `RedFileSystem` RED4ext plugin** (`GetFile` → `ReadAsText`). Simple
+   and proven, but it is a *new runtime dependency* we do not currently ship,
+   and its sandbox is limited to `r6\storages\`.
+
+Neither is a small change. Until a compile problem actually shows up, the pack
+ships on the existing generator.
 
 ---
 
@@ -245,7 +291,31 @@ Hebrew plan:
 2. **Hebrew = attempt with a custom font** (§5.4). Unproven in CP2077; pre-reversed
    fallback keeps it shippable.
 3. **Packaging = BOTH** per-language packs and one multi-language pack (§5).
-4. Still open (non-blocking, defaults proposed):
+4. **Multi-language pack ships on the existing per-language generator**, not the
+   archive backend (user, Oct 4). Reason: the assumed ArchiveXL read API does not
+   exist (§5.3.1) and the real literal count is 6,950 / 21.5 MB, not 25k / 85 MB
+   (§5.0). The archive backend stays documented as a deferred optimisation.
+5. **In-game test is DEFERRED, not dropped** (user, Oct 4). It was going to be
+   first, but no testing happens this session — it is now the project's next
+   task. State at hand-off: browser pack installed live and byte-identical to
+   the repo English build; CET surface deployed (74 files) with
+   `EXALTED.OPEN_EXALTED_TERMINAL=0` (unbound — bind in CET overlay
+   Shift+Minus > Bindings > EXALTED); no redscript invalidation needed
+   (cache 17:37 newer than our `.reds` 10:39); `gt77 --health` fully green;
+   Heroic log `gKHon7YYyofMsKLnz6tzhd_sideload/launch.log` has 0 EXALTED
+   mentions. Checklist is in `~/Projects-Pending.txt` #18. Nothing in EXALTED
+   has ever been rendered on screen, so the localized surfaces and the
+   hardcoded Raj font (§5.4) all remain unverified.
+6. **Canon rule C6 (user, Oct 4): only the 66-book canon.** No deuterocanonical
+   text anywhere, *including text embedded inside a canonical book* — which is
+   how `rus` fails (Daniel 13/14 = Susanna + Bel and the Dragon inside Daniel).
+   Enforced automatically in `convert_bible.py`; audited in
+   `docs/BIBLE-VERIFICATION-FINDINGS.md` §6.
+7. **Shippable set (Oct 4): en, es, cze, deu, dut, pol.** `hun` moved to HELD —
+   its OSIS header carries no edition/date and C4 requires in-file evidence, not
+   a filename. `deu` ships as-is with a disclosed Joel/Malachi chapter-boundary
+   difference (German numbering), recorded in its `DISCLOSURE.json`.
+8. Still open (non-blocking, defaults proposed):
    - language build order: **P0 Spanish** (validates the pipeline against text we
      already hold) -> P1 French/German/Italian/Dutch/Polish/Czech/Hungarian ->
      P2 Russian/Japanese/Chinese/Korean/Arabic/Thai/Portuguese -> P3 Hebrew.
