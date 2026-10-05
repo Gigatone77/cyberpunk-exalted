@@ -28,8 +28,10 @@ and are deliberately EXCLUDED -- EXALTED ships the received text, not a
 source-critical apparatus.
 
 Reading conventions encoded here (each recorded in the build report):
-  * ketiv/qere -- where a <k> (ketiv) / <q> (qere) pair appears, the QERE is
-    printed. That is what a reading edition prints; the defective ketiv is not
+  * ketiv/qere -- a variant is spelled as two adjacent siblings, <k> defective
+    ketiv then <q> correct qere, so a real pair is a <k> whose next sibling is a
+    <q>: 1246 pairs, plus 23 lone <k> and 33 lone <q>. The QERE is printed.
+    That is what a reading edition prints; the defective ketiv is not
     part of the read text.
   * <x> -- carries the letter that must be joined to the preceding one with no
     space (e.g. <w>be<x>t</x>eden</w>). Descendant-text concatenation handles
@@ -137,23 +139,40 @@ def resolve_books(src_dir):
 def book_payload(book_el):
     """Return {chapter: [ {v, text} ]} for one <book> element."""
     out = {}
-    pe = samekh = kq = 0
+    pe = samekh = 0
+    kq = {"pair": 0, "ketiv_only": 0, "qere_only": 0}
     for c in book_el.findall("c"):
         cn = int(c.get("n"))
         rows = []
         for v in c.findall("v"):
             vn = int(v.get("n"))
             parts = []
-            for child in v:
+            kids = list(v)
+            # UXLC spells a variant out as two ADJACENT SIBLINGS in this order:
+            # <k> defective ketiv, then <q> the correct qere. So a genuine pair is
+            # a <k> whose next sibling is a <q> -- not "a <k> and a <q> were seen
+            # somewhere in this verse". Counting the two markers separately and
+            # adding them (the previous behaviour) reports 2548, which is not a
+            # pair count at all: the corpus holds 1269 <k> and 1279 <q>, of which
+            # only 1246 are genuinely paired.
+            for i, child in enumerate(kids):
                 tag = child.tag
+                nxt = kids[i + 1].tag if i + 1 < len(kids) else None
+                prv = kids[i - 1].tag if i > 0 else None
                 if tag == "w":
                     # itertext() picks up the inline <x> join letters.
                     parts.append("".join(child.itertext()))
                 elif tag == "q":
-                    kq += 1
+                    # qere: the reading edition's text, so this is what we print.
                     parts.append("".join(child.itertext()))
+                    if prv != "k":
+                        kq["qere_only"] += 1
                 elif tag == "k":
-                    kq += 1  # ketiv: deliberately not printed
+                    # ketiv: deliberately not printed, only counted.
+                    if nxt != "q":
+                        kq["ketiv_only"] += 1
+                    else:
+                        kq["pair"] += 1
                 elif tag == "pe":
                     # counted, not emitted -- see the module docstring
                     pe += 1
@@ -176,7 +195,8 @@ def convert(src_dir, out_dir, lang="heb", note=()):
     cmap = canon_short_map()
     books, report_flags = [], []
     total_ch = total_v = 0
-    stats = {"pe": 0, "samekh": 0, "ketiv_qere": 0}
+    stats = {"pe": 0, "samekh": 0,
+              "ketiv_qere": {"pair": 0, "ketiv_only": 0, "qere_only": 0}}
     disclosure = [{"kind": "editorial_note",
                    "note": "Tanakh (39 books, no New Testament). Text is the "
                            "Tanach.us UXLC; qere printed where ketiv/qere differ."},
@@ -204,7 +224,11 @@ def convert(src_dir, out_dir, lang="heb", note=()):
 
         payload, st = book_payload(b)
         for k in stats:
-            stats[k] += st[k]
+            if isinstance(stats[k], dict):
+                for kk in stats[k]:
+                    stats[k][kk] += st[k][kk]
+            else:
+                stats[k] += st[k]
 
         ch_count = len(payload)
         v_count = sum(len(r) for r in payload.values())
@@ -302,8 +326,13 @@ def convert(src_dir, out_dir, lang="heb", note=()):
                                 "syntax and hard-wraps verses itself. Wording is "
                                 "unaffected; the Masoretic paragraph division is "
                                 "not carried into the .reds.",
-            "ketiv_qere_pairs": stats["ketiv_qere"],
+            "ketiv_qere_pairs": stats["ketiv_qere"]["pair"],
+            "ketiv_standalone": stats["ketiv_qere"]["ketiv_only"],
+            "qere_standalone": stats["ketiv_qere"]["qere_only"],
             "ketiv_qere_policy": "qere printed, defective ketiv omitted",
+            "ketiv_qere_pairing": "a <k> immediately followed by a <q> as "
+                                  "adjacent siblings; unpaired markers counted "
+                                  "separately",
         },
         "disclosure": disclosure,
         "disclosure_summary": {
@@ -371,9 +400,12 @@ def selftest(src_dir):
         assert mal and mal[0]["n"] == 26, mal
         print(f"selftest OK: 39 books, {rep['total_chapters']} chapters, "
               f"{rep['total_verses']} verses; Gen 1:1 -> {v1[:40]}...")
-        print(f"  ketiv/qere pairs: {rep['structure']['ketiv_qere_pairs']}, "
-              f"open par. {rep['structure']['open_paragraphs_pe']}, "
-              f"closed par. {rep['structure']['closed_paragraphs_samekh']}")
+        st = rep["structure"]
+        print(f"  ketiv/qere pairs: {st['ketiv_qere_pairs']}, "
+              f"standalone k {st['ketiv_standalone']}, "
+              f"standalone q {st['qere_standalone']}, "
+              f"open par. {st['open_paragraphs_pe']}, "
+              f"closed par. {st['closed_paragraphs_samekh']}")
 
 
 def main():
