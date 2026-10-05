@@ -175,6 +175,34 @@ if nums != expect_nums:
 
 canon = json.load(open(canon_path, encoding="utf-8"))
 canon_short = {int(b["n"]): b["short"] for b in canon}
+canon_all_shorts = {b["short"] for b in canon}
+
+# SUBCANON GATE. The positional check below (short[n] == canon_short[n]) is the
+# strongest possible check and is exactly right for a full 66-book build, so it
+# is NOT relaxed. But a 39-book Tanakh is a different canon: it numbers Malachi
+# 26 where the KJV canon numbers it 39, so its 39 correct canonical slugs sit at
+# positions that will never line up with canon_short[n]. Matching positionally
+# there would demand the WRONG slug (it wanted s"Nah" to be Eccl) -- i.e. it
+# would have driven us into the mislabelling trap the anchors exist to catch.
+#
+# For a sub-canon build the equivalent guarantee is: every slug is a canonical
+# KJV short, all are unique, and the set is exactly the canonical OT subset
+# (KJV books 1..39). That is still provably strict -- no invented, misnumbered
+# or duplicate slug can pass.
+OT_CANON_N = 39
+subcanon = len(nums) != 66
+if subcanon:
+    ot_expected = {canon_short[n] for n in range(1, OT_CANON_N + 1)}
+    subcanon_ok = set(shorts.values()) == ot_expected
+    if not subcanon_ok:
+        missing = sorted(ot_expected - set(shorts.values()))
+        extra = sorted(set(shorts.values()) - ot_expected)
+        errors.append(
+            f"sub-canon ({len(nums)} books) slug set is not the canonical OT "
+            f"set of {OT_CANON_N}: missing={missing[:6]} extra={extra[:6]}"
+        )
+    if len(set(shorts.values())) != len(nums):
+        errors.append("sub-canon build has duplicate slugs")
 
 # The declared total must match the number of cases actually emitted, or the
 # reader loops over books that do not exist.
@@ -207,9 +235,14 @@ for n in nums:
             f'book {n} ({nm}): slug s"{s}" is not route-safe ({", ".join(why)})'
             f' -> would ship NETdir://exalted.terminal/b/{s}'
         )
-    elif n in canon_short and s != canon_short[n]:
+    elif n in canon_short and s != canon_short[n] and not subcanon:
         errors.append(
             f'book {n} ({nm}): slug s"{s}" != canonical KJV slug s"{canon_short[n]}"'
+            f" — /b/<short> must resolve in every language"
+        )
+    elif s not in canon_all_shorts:
+        errors.append(
+            f'book {n} ({nm}): slug s"{s}" is not a canonical KJV book short'
             f" — /b/<short> must resolve in every language"
         )
     if not nm.strip():
