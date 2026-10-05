@@ -118,7 +118,7 @@ Scritture, ISBN 88-237-1051-0. **Redistribution in a Nexus zip is not permitted.
 ### RF-7 — BLOCKER (rights): Thai KJV is CC BY-NC-ND — the licence forbids what our pipeline does
 
 `tha-thai.osis.xml` is **not** "Thai LPT" as `VETTED.txt` claims; its header says `KJV-Thai`, `osisIDWork
-= kjvthai`, rights pointer `http://thaipope.org/`. eBible's record for the identical module (`thaKJV`) states:
+= kjvthai`, rights pointer to thaipope.org. eBible's record for the identical module (`thaKJV`) states:
 
 > Copyright © 2003 Philip Pope — CC BY-**NC**-**ND** 4.0
 > *"You do not sell this work for a profit. **You do not change any of the words or punctuation of the
@@ -333,7 +333,7 @@ Extracted verbatim from `out/provenance.json`. **Bold** = a rights statement tha
 | `sqi` | `alb1` | Albanian Version | Free Bible Software Group | **"I think public domain" — but © ABS (RF-8)** |
 | `swe` | `SVD` | Swedish 1917 Version | FREE BIBLE SOFTWARE GROUP | "i think public domain" |
 | `tgl` | `TlgAngBiblia` | Ang Dating Biblia | Theologische Initiative Freiburg | **"This Bible is now Public Domain."** ✓ |
-| `tha` | `kjvthai` | KJV-Thai | "Your Organisation" | **"http://thaipope.org/" → CC BY-NC-ND © 2003 Philip Pope** |
+| `tha` | `kjvthai` | KJV-Thai | "Your Organisation" | **thaipope.org → CC BY-NC-ND © 2003 Philip Pope** |
 | `fin` | `fin` | Finish Version *(sic)* | Free Bible Software Group | **— none —** |
 
 **Structural identity (Q2):** `ita` `mri` `sqi` `tgl` `tha` are byte-identical to KJV structure (66/1189/31102).

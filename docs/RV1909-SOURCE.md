@@ -114,12 +114,12 @@ KJV `books.json` (ASCII, `Gen`, `2Chr`) while display names stay Spanish.
 BibleAquifer digital text has broken verse numbering (18 empty targets, silent
 chapter shifts such as Job 40 running +5, Números 12:16 landing at 13:1) and
 one corrupted scan lineage between all three providers. It is rebuilt from
-`spaRV1909_usfx.xml` by `reconstruct_digital_es.py` purely as an audit witness.
+`spaRV1909_usfx.xml` by `reconstruct_digital_es.py` (held at `dist/_held-not-shippable/publishing/reconstruct_digital_es.py` as an audit-witness tool, never run in a build) purely as an audit witness.
 
 ## Rebuilding
 
 ```bash
-python3 scripts/rv1909/reconstruct_digital_es.py            # rebuild the witness
+# Note: reconstruct_digital_es.py is held (offline-only). Do not run.
 python3 scripts/rv1909/build_es_from_pdf.py                 # -> /tmp/opencode/es-pdf
 python3 scripts/rv1909/realign_and_variants.py              # -> es-variants.tsv
 python3 scripts/gen-exalted-reds.py --src translations/es --book-subdir "" \

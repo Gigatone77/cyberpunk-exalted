@@ -13,10 +13,9 @@ stated otherwise below. No third-party copyrighted code or data is bundled.
   seeded from the desktop EXALTED engine's bundled data.
 
 ## Framework / APIs used (no source included)
-- **Cyber Engine Tweaks** — MIT licensed
-  (github.com/maximegmd/CyberEngineTweaks). Used via its public Lua mod API
+- **Cyber Engine Tweaks** — MIT licensed. Used via its public Lua mod API
   (`registerHotkey`, ImGui bindings, the `mods/` folder contract).
-- **Dear ImGui** — MIT licensed (github.com/ocornut/imgui), exposed to mods
+- **Dear ImGui** — MIT licensed, exposed to mods
   through CET. Used via its API only.
 
 ## Original code in this distribution

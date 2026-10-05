@@ -6,8 +6,8 @@ Outputs
   /tmp/opencode/es-diff-ledger.tsv  every verse where the PDF and the digital
                            module disagree, classified
 
-The digital witness is rebuilt from eBible's USFX by
-scripts/rv1909/reconstruct_digital_es.py — it is NEVER the shipped output.
+The digital witness was rebuilt from eBible's USFX by
+scripts/rv1909/reconstruct_digital_es.py (held at dist/_held-not-shippable/publishing/reconstruct_digital_es.py as an audit-witness tool, must never run in a build) — it is NEVER the shipped output.
 
 Documented structural adjudications
 -----------------------------------

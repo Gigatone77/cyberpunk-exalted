@@ -136,8 +136,8 @@ Legend: PD = public domain, shippable. Blocked = not shippable / not acceptable.
 > eBible / wordproject / BibleAquifer RV1909 digital text silently **shifts
 > chapters** (Job 40 runs 5 verses long; Números 12:16 lands at 13:1), has **18
 > empty verse targets**, and all three providers share **one corrupted scan
-> lineage**. It is rebuilt by `scripts/rv1909/reconstruct_digital_es.py` as an
-> **audit witness only**. The printed PDF is the shipping authority; the digital
+> lineage**. It is rebuilt by `scripts/rv1909/reconstruct_digital_es.py` (held at `dist/_held-not-shippable/publishing/`) as an
+> **audit witness only** — never run in a build. The printed PDF is the shipping authority; the digital
 > line exists solely to diff against. Full detail: `docs/RV1909-SOURCE.md`.
 > Any other language in this table that relies on a provider USFX must be
 > checked for the same failure mode before it is trusted.

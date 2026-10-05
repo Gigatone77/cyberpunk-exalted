@@ -44,12 +44,12 @@ render time.
    `docs/nexus-description.bbcode.txt` and
    `scripts/rv1909/reconstruct_digital_es.py` →
    `dist/_held-not-shippable/publishing/`. Keep `docs/RV1909-SOURCE.md`; the
-   script it cites is an audit witness that must never run in a build.
+   script it cites is an audit witness (held, never run in a build).
 3. **Retire the Nexus staging dir** `~/installer-usb/nexus-upload/EXALTED-Terminal-77/`
    and the ToolBox release mirror → `~/installer-usb/_retired-offline/`. No
    uploadable artifact then sits in a staging path.
 4. **Add an offline gate** to `package.sh`, beside the existing slug gate,
-   refusing to build when the staged tree contains `http://`, `https://`, or a
+   refusing to build when the staged tree contains URLs or a
    network API. Runs on every build so this cannot regress.
 5. Correct the stale HTML-library text in `~/Projects-Pending.txt` item 18.
 
@@ -173,8 +173,7 @@ a token.
 1. **Integrity** — `compileall`, `ruff --select F,B,E9`, converter `--selftest`
    14/14, the new offline gate, fresh-venv install of the built artifact.
 2. **Bugs** — exercise each changed path; re-run the test it was meant to satisfy.
-3. **Dead code** — no unused imports, no `pass` branches, no reference to the
-   retired `reconstruct_digital_es.py`.
+3. **Dead code** — no unused imports, no `pass` branches, and ensure no code tries to read/execute the held `reconstruct_digital_es.py` (references exist only in prose/docs pointing to its hold location).
 4. **Web cross-reference** — confirm the font-family paths and the WLC/UXLC
    licensing statements still hold, so a later agent does not repeat a stale
    assumption.

@@ -45,7 +45,7 @@
 [font=Verdana][size=3][b]Only for the browser site:[/b]
 [list]
 [*]Cyberpunk 2077 2.x
-[*][b]Browser Extension Framework[/b] — [url=https://www.nexusmods.com/cyberpunk2077/mods/10038]Nexus mod 10038[/url] (0.9.7+), the framework that lets a mod register a custom [i]NETdir://[/i] site into the vanilla browser. Without it the site simply is not listed: the file still compiles, so you get no errors, just no page.
+[*][b]Browser Extension Framework[/b] — Nexus mod 10038 (0.9.7+), the framework that lets a mod register a custom [i]NETdir://[/i] site into the vanilla browser. Without it the site simply is not listed: the file still compiles, so you get no errors, just no page.
 [*]The framework's own prerequisites: [b]redscript[/b], [b]RED4ext[/b], [b]Codeware[/b] (and optionally [b]Mod Settings[/b], which adds an in-game toggle for the framework).
 [*][b]CET is NOT required[/b] for the browser site — that surface is pure redscript, no Lua and no ImGui.
 [/list][/size][/font]
@@ -79,6 +79,6 @@
 [/list][/size][/font]
 
 [font=Verdana][size=4][b]Credits / License[/b][/size][/font]
-[font=Verdana][size=3]Bible text: King James Version 1611 / Oxford 1769 — [i]public domain[/i] (Project Gutenberg; Crosswire/eBible.org). No copyrighted modern-spelling edition is used. CET (MIT) and Dear ImGui (MIT) are used only through their public APIs, and Browser Extension Framework (r457 & gh057), RED4ext, Codeware, redscript and Mod Settings likewise — no framework source is bundled. All other code (the Lua mod, the redscript site, the data generator, the exporter, scripts and docs) is original. Full provenance: [b]docs/CREDITS.md[/b].[/size][/font]
+[font=Verdana][size=3]Bible text: King James Version 1611 / Oxford 1769 — [i]public domain[/i]. No copyrighted modern-spelling edition is used. CET (MIT) and Dear ImGui (MIT) are used only through their public APIs, and Browser Extension Framework, RED4ext, Codeware, redscript and Mod Settings likewise — no framework source is bundled. All other code (the Lua mod, the redscript site, the data generator, the exporter, scripts and docs) is original. Full provenance: [b]docs/CREDITS.md[/b].[/size][/font]
 
-[font=Verdana][size=3][b]Source[/b] — [url=https://github.com/Gigatone77]Gigatone77[/url][/size][/font]
+[font=Verdana][size=3][b]Source[/b] — Gigatone77[/size][/font]

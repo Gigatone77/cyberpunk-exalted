@@ -68,7 +68,7 @@ computer, open a browser, choose **Exalted Terminal 77**.
 
 - Bible text: King James Version (Authorized Version) 1611 / Oxford 1769 —
   **public domain** outside the UK printing patent (Project Gutenberg,
-  Crosswire/eBible.org). No copyrighted modern-spelling edition is used.
+  Crosswire / eBible). No copyrighted modern-spelling edition is used.
 - CET (MIT) and Dear ImGui (MIT) are used only through their public APIs —
   no framework source is bundled.
 - All other code (Lua mod, Go exporter, scripts, docs) is original.

@@ -227,6 +227,7 @@ print(f"  slug gate ok [{tag}]: {len(nums)} books, "
       f"{len(set(shorts.values()))} unique ASCII slugs, all canonical KJV")
 PY
 
+
 mkdir -p "$DIST"
 
 pack() { # $1=zip name (with .zip), then game-relative dirs under $STAGE to include
@@ -246,6 +247,91 @@ BROWSERTREE="$STAGE/r6/scripts/EXALTED"
 mkdir -p "$BROWSERTREE"
 cp -r "$SITE_SRC/." "$BROWSERTREE/"
 
+# --- offline gate -------------------------------------------------------------
+# The project is offline-only (user directive 2026-10-05): no publishing surface,
+# no remote, and nothing in a shipped artifact that points at an online service.
+# This gate runs on EVERY build, like the slug gate above, so a URL or a network
+# call cannot re-enter through a data or credit file unnoticed.
+#
+# What is rejected:
+#   1. any http:// or https:// literal;
+#   2. any bare reference to a known online host, e.g. github.com or
+#      nexusmods.com without a scheme (a scheme-less host slipped past an
+#      earlier http://-only sweep, so this form is checked explicitly);
+#   3. network API names in code — the mod must never open a socket.
+#
+# MIT attribution notices keep their project NAMES here (cet/EXALTED/CREDITS.txt
+# credits "Cyber Engine Tweaks" and "Dear ImGui"); only the addresses are gone.
+# NETdir:// is deliberately NOT rejected: it is the game's own in-memory virtual
+# filesystem, not a network protocol.
+python3 - "$STAGE" "${LANG_TAG:-en}" <<'PY' || exit 1
+import os
+import re
+import sys
+
+stage, tag = sys.argv[1], sys.argv[2]
+
+TEXT_EXT = {".reds", ".lua", ".txt", ".json", ".md", ".yml", ".yaml", ".xml", ".cfg", ".ini"}
+SCAN_EXT = TEXT_EXT | {".sh", ".py", ""}
+# Extensions that legitimately contain Bible source markup or credentials-free
+# third-party notices are still scanned; nothing is exempt except binaries.
+SKIP_DIRS = {".git", "__pycache__", ".ruff_cache"}
+
+URL_RE = re.compile(r"https?://", re.I)
+# Hosts that mean "this artifact points at an online service". Matched WITHOUT a
+# scheme too, so a bare host cannot hide from the check above.
+HOSTS = (
+    "github.com", "githubusercontent.com", "gitlab.com", "nexusmods.com",
+    "redmodding.org", "nativedb", "mechon-mamre.org", "tanach.us",
+    "thaipope.org", "gutenberg.org", "ebible.org", "eBible.org",
+    "wikipedia.org", "creativecommons.org", "s3.amazonaws.com",
+)
+API_RE = re.compile(
+    r"\b(curl|wget|HttpClient|urllib|requests\.|socket\.|XMLHttpRequest|"
+    r"WebSocket|io\.popen|os\.system)\b"
+)
+
+
+def walk(root):
+    for dirpath, dirnames, filenames in os.walk(root):
+        dirnames[:] = [d for d in dirnames if d not in SKIP_DIRS]
+        for fn in sorted(filenames):
+            yield os.path.join(dirpath, fn)
+
+
+errors = []
+checked = 0
+for path in walk(stage):
+    ext = os.path.splitext(path)[1].lower()
+    if ext not in SCAN_EXT:
+        continue
+    try:
+        text = open(path, "r", encoding="utf-8").read()
+    except (UnicodeDecodeError, OSError):
+        continue  # binary or unreadable: not a place a URL could hide as text
+    checked += 1
+    rel = os.path.relpath(path, stage)
+    for lineno, line in enumerate(text.splitlines(), 1):
+        if URL_RE.search(line):
+            errors.append(f"{rel}:{lineno}: http(s) URL — {line.strip()[:70]}")
+        for host in HOSTS:
+            if host.lower() in line.lower():
+                errors.append(f"{rel}:{lineno}: online host '{host}' — {line.strip()[:70]}")
+        if ext in TEXT_EXT and API_RE.search(line):
+            errors.append(f"{rel}:{lineno}: network API — {line.strip()[:70]}")
+
+if errors:
+    print(f"ERROR [{tag}]: offline gate FAILED — {len(errors)} problem(s):", file=sys.stderr)
+    for e in errors[:40]:
+        print(f"  - {e}", file=sys.stderr)
+    if len(errors) > 40:
+        print(f"  ... and {len(errors) - 40} more", file=sys.stderr)
+    print("       The project is offline-only. Shipping artifacts carry no URLs,", file=sys.stderr)
+    print("       no online hosts, and no network calls.", file=sys.stderr)
+    sys.exit(1)
+
+print(f"  offline gate ok [{tag}]: {checked} text file(s), no URLs, hosts or network calls")
+PY
 if [ "$SKIP_CET" = "1" ]; then
     pack "$BROWSER_ZIP" "r6"
     echo "Packed (browser only${LANG_PART:+, language$LANG_PART}):"

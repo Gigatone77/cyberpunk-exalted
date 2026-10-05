@@ -359,7 +359,7 @@ All stdlib-only Python 3, no third-party dependencies.
 | `scripts/build_lang.sh` | One language end to end: reads real counts from the build report, asserts them against the generator, stages the site tree, runs the slug gate, zips. `--no-package` builds a site tree with **no zip**, so held languages cannot be uploaded by accident. |
 | `scripts/gen-exalted-reds.py` | JSON → redscript `.reds` string literals. `--expect-*` turns the final count into a hard assert. |
 | `scripts/package.sh` | Zips the browser/CET surfaces. Language-tag validation, ASCII canonical slug gate, refuses a language payload paired with the English CET tree. |
-| `scripts/rv1909/reconstruct_digital_es.py` | Spanish audit witness (never shipped) |
+| `scripts/rv1909/reconstruct_digital_es.py` | Spanish audit witness (never shipped; held at `dist/_held-not-shippable/publishing/`) |
 | `cet/EXALTED/lib/cache.lua` | Lua-side cache builder, kept in cleanup parity with the Python path |
 
 ### 8.1 How to reproduce a language end to end
