@@ -19,13 +19,15 @@ Companion docs: `docs/MULTILINGUAL-PLAN.md` (design + phases),
 | Bucket | Count | Languages |
 |---|---|---|
 | **SHIPPED** (artifact exists in `dist/`) | 2 | `en`, `es` |
+| **STAGED browser zips (built 2026-10-05, staged 2026-10-06)** | 6 | `cze deu dut pol rus swe` — localized docs exist for `cze dut rus` only (2026-10-08), the rest held on §4b; a 7th zip, `heb` (**REJECTED**, §6), was moved out of staging into `_superseded/` on 2026-10-08; see §4 |
 | **BUILT-NOT-PACKAGED** | 19 | `bul chi cze deu dut fin fra hun ita kor mri pol por ron rus sqi swe tgl tha` |
 | **VETTED-NOT-BUILT** | **0** | every `BUILD` row in `VETTED.txt` has a `build/<lang>/` dir |
 | **REJECTED** (reason recorded, never silently dropped) | 7 | `dan hrv heb lat lav nor swa tur` |
 | Not yet vetted (named in the plan, no source on disk) | 4 | `ja ar uk` + Turkish is rejected above |
 
-Of the 19 built languages, only **6 are actually package-ready today**
-(`chi cze dut por ron rus` — genuine native book names). The other **13** put
+Of the 19 built languages, only **5 are actually package-ready today**
+(`chi cze dut por rus` — genuine native book names; `ron` was removed
+2026-10-06). The other **13** put
 English book names in front of foreign scripture — see §4b. `pol` is the odd
 one out: its *source* lists the books in English, so that one is a source-data
 problem, not a parse problem.
@@ -69,8 +71,24 @@ English + Spanish are the only languages with a **user sign-off on the version**
 
 All 19 converted and verified by `scripts/convert_bible.py`
 (`bible-sources/build/<lang>/`), all re-generated + packaged + slug-gated
-during the Oct 4 packaging audit. **No artifacts exist for any of these** —
-nothing has been written to `dist/`, the Nexus staging folder or ToolBox.
+during the Oct 4 packaging audit.
+
+**CORRECTION 2026-10-08 (the old text here said "no artifacts exist" — that
+stopped being true on Oct 5).** Browser zips now exist for six of these —
+built 2026-10-05, staged 2026-10-06 in `dist/`,
+`installer-usb/nexus-upload/EXALTED-Terminal-77/` and the ToolBox mirror:
+`cze deu dut pol rus swe`. A seventh zip, `heb`, is **REJECTED** (§6) and was
+moved out of the upload staging root into `_superseded/` on 2026-10-08 (move,
+never rm) so it cannot be uploaded by accident. Localized `DESCRIPTION-…` /
+`INSTALL-…` text exists
+for `en`, `es` and — written 2026-10-08 — `cze dut rus`; the other four are
+held: `deu pol swe` on English book names (§4b), `heb` on §6.
+
+Book names above were verified **from the staged zips themselves**
+(`r6/scripts/EXALTED/data/ExaltedData.reds`), not from the build reports:
+native = `cze dut rus heb`; English fallback = `deu pol swe`. `rus` is
+package-ready on names but still carries the §7 font blocker (`Site.reds`
+hardcodes `raj.inkfontfamily`), so its INSTALL discloses the risk.
 
 `flags` = per-book verse-count deltas vs canonical KJV in `build-report.json`.
 `disc.` = `disclosure` entries (`unfilled_gap`). `native` = books whose display
