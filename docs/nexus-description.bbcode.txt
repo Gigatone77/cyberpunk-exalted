@@ -33,6 +33,7 @@
 [*][b]Fully offline[/b] — no network, no external process, no companion service. Works on any OS. The public-domain KJV (1611 / Oxford 1769) is bundled as JSON and compiled into the game surfaces; the CLI carries it inside its binary. Your desktop Bible collection is never touched.
 [*][b]Clean text[/b] — the source's cross-reference apparatus, section markers and translator's notes are stripped at build time, so no stray glyphs reach the screen.
 [*][b]Independent[/b] — each surface ships separately and works without the others.
+[*][b]Compatible[/b] with the [b]Welcome to Night City[/b] mod collection by [b]z9er[/b] — collection revision [b]481[/b].
 [/list][/size][/font]
 
 [font=Verdana][size=4][b]Files[/b][/size][/font]
