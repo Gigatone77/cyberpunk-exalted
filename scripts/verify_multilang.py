@@ -12,14 +12,18 @@ Per language module ``ExaltedData<Sfx>.reds``:
     canonical slug for that book number (slugs are shared across languages so
     ``/b/<short>`` resolves in every language);
   * ``ExaltedBookTotal`` matches the number of emitted cases;
-  * exactly N ``ExaltedBookNN<Sfx>.reds`` modules exist.
+  * exactly N ``ExaltedBookNN<Sfx>.reds`` modules exist;
+  * every ``ExaltedBookNN`` reference in the master carries the language suffix
+    (its imports and call sites must match the suffixed book modules).
 
 Across the tree:
   * ``ExaltedLang.reds`` exists and ``ExaltedLangTotal`` equals the number of
     language modules;
   * every ``ExaltedData<Sfx>`` is imported by ``ExaltedLang.reds``;
   * no ``case <n>: if `` anywhere (langify once emitted that; it is invalid
-    redscript).
+    redscript);
+  * no ``;;`` (double semicolon) anywhere — langify once emitted
+    ``default: return s"";;`` and it broke the redscript compile.
 
 Read-only. Never touches Bible source. Exit 0 = pass, 1 = fail.
 """
@@ -33,6 +37,13 @@ SLUG_RE = re.compile(r"^[A-Za-z0-9]{1,12}$")
 CASE_RE = re.compile(r'^\s*case (\d+): return s"(.*)";\s*$')
 DATA_RE = re.compile(r"^ExaltedData([A-Z][a-z]+)\.reds$")
 BAD_SWITCH_RE = re.compile(r"case \d+:\s*if ")
+# A double (or longer) semicolon is never valid redscript. langify.py once
+# emitted `default: return s"";;` by appending a ';' to a default already ending
+# in ';'; it compiled clean in the single-language path (gen-exalted-reds.py)
+# and only broke the multi build. Shipping it made REDscript fail with
+# "REDScript compilation has failed ... caused by mods: EXALTED". This is the
+# guard that ends that whole class of bug.
+DOUBLE_SEMI_RE = re.compile(r";;")
 
 
 def cases(text, func):
@@ -109,6 +120,19 @@ def main():
         if len(mods) != len(nums):
             errors.append(f"[{sfx}] {len(mods)} book modules but {len(nums)} books declared")
 
+        # langify.py once renamed the book modules but not the master's imports
+        # or call sites, shipping `import ExaltedBook01.*` against
+        # `module ExaltedBook01<Sfx>` -> "[UNRESOLVED_IMPORT] ... module
+        # 'ExaltedBook01' has no members or does not exist" for all 66 books.
+        # Every `ExaltedBookNN` token in a suffixed master must be followed by
+        # the language suffix (`ExaltedBook01<Sfx>` / `ExaltedBook01<Sfx>Chapter`).
+        for m in re.finditer(r"ExaltedBook\d\d", text):
+            if text[m.end():m.end() + len(sfx)] != sfx:
+                errors.append(
+                    f"{name}: unsuffixed book reference "
+                    f"{text[m.start():m.end() + 7]!r} (expected {sfx} suffix)")
+                break
+
         for n in nums:
             s = shorts[n]
             if not s:
@@ -134,8 +158,15 @@ def main():
             f"ExaltedLangTotal()={tm.group(1)} but {len(suffixes)} language modules present")
 
     for path in glob.glob(os.path.join(data_dir, "*.reds")):
-        if BAD_SWITCH_RE.search(open(path, encoding="utf-8").read()):
+        text = open(path, encoding="utf-8").read()
+        if BAD_SWITCH_RE.search(text):
             errors.append(f"{os.path.basename(path)}: invalid 'case <n>: if '")
+        # Report the offending line numbers: a `;;` is a syntax error, so shipping
+        # it turns into a redscript compile failure for the user.
+        for lineno, line in enumerate(text.splitlines(), 1):
+            if DOUBLE_SEMI_RE.search(line):
+                errors.append(
+                    f"{os.path.basename(path)}:{lineno}: ';;' — invalid redscript")
 
     if errors:
         print(f"ERROR: multi-language gate FAILED — {len(errors)} problem(s):", file=sys.stderr)
