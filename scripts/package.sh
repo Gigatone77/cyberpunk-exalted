@@ -3,10 +3,14 @@
 # so extracting into the game root installs them — like standard CP2077
 # Nexus mods. Pure Lua + pure redscript: data ships inside, no host binary.
 #
-# Produces three zips:
-#   EXALTED_Terminal_77-0.1.5.zip        — UNIFIED (CET + browser site)
-#   EXALTED_Terminal_77-CET-0.1.5.zip    — CET surface only
-#   EXALTED_Terminal_77-Browser-0.1.2.zip — in-game browser site only
+# Default (single-language) build produces:
+#   EXALTED_Terminal_77-CET-0.1.5.zip     — CET surface (English-only)
+#   EXALTED_Terminal_77-Browser-0.1.2.zip — in-game browser, ONE language
+#
+# Multi-language build (EXALTED_MULTILANG=1) produces the ONE All-in-One mod,
+# which carries every available language behind a runtime /<code> switch:
+#   EXALTED_Terminal_77-AllInOne-0.1.5.zip       — CET + multi-language browser
+#   EXALTED_Terminal_77-Browser-MultiLang-0.1.2.zip — browser only, all languages
 #
 # Version overrides via env: EXALTED_VERSION (CET, default from init.lua),
 # EXALTED_BROWSER_VERSION (browser site, default 0.1.2).
@@ -19,6 +23,13 @@
 #   EXALTED_SKIP_CET — set to 1 to build only the browser zip (the CET surface
 #                      reads cet/EXALTED/data/ and is English-only, so a
 #                      language build MUST set this)
+#   EXALTED_MULTILANG — set to 1 to package the ONE All-in-One mod: the browser
+#                      site built from a combined tree (scripts/langify.py) that
+#                      carries every language, switching at runtime by the
+#                      NETdir address. Requires EXALTED_SITE_SRC to point at a
+#                      multi-language site tree (ExaltedLang.reds + suffixed
+#                      ExaltedData<Sfx>.reds). This is the only build that emits
+#                      the All-in-One zip.
 #   EXALTED_DIST     — output dir (default <repo>/dist). Point this at a
 #                      scratch dir to verify a language build without
 #                      publishing into dist/.
@@ -48,14 +59,16 @@ BROWSER_VERSION="${EXALTED_BROWSER_VERSION:-0.1.2}"
 SITE_SRC="${EXALTED_SITE_SRC:-$REPO/internet/EXALTED}"
 LANG_TAG="${EXALTED_LANG_TAG:-}"
 SKIP_CET="${EXALTED_SKIP_CET:-0}"
+MULTILANG="${EXALTED_MULTILANG:-0}"
 CANON_BOOKS="$REPO/cet/EXALTED/data/books.json"
 
 LANG_PART=""
 [ -n "$LANG_TAG" ] && LANG_PART="-$LANG_TAG"
 
-CET_ZIP="EXALTED_Terminal_77-${CET_VERSION}.zip"
+UNIFIED_ZIP="EXALTED_Terminal_77-AllInOne-${CET_VERSION}.zip"
 CET_ONLY_ZIP="EXALTED_Terminal_77-CET-${CET_VERSION}.zip"
 BROWSER_ZIP="EXALTED_Terminal_77-Browser${LANG_PART}-${BROWSER_VERSION}.zip"
+BROWSER_MULTI_ZIP="EXALTED_Terminal_77-Browser-MultiLang-${BROWSER_VERSION}.zip"
 
 if [ ! -f "$CANON_BOOKS" ]; then
     echo "ERROR: canonical cet/EXALTED/data/books.json missing — run the bibleexport exporter first" >&2
@@ -77,6 +90,20 @@ case "$SKIP_CET" in
         ;;
 esac
 
+case "$MULTILANG" in
+    0|1) ;;
+    *)
+        echo "ERROR: EXALTED_MULTILANG must be 0 or 1 (got '$MULTILANG')" >&2
+        exit 1
+        ;;
+esac
+
+if [ "$MULTILANG" = "1" ] && [ "$SKIP_CET" = "1" ]; then
+    echo "ERROR: EXALTED_MULTILANG=1 needs the CET surface for the All-in-One," >&2
+    echo "       so EXALTED_SKIP_CET must be 0." >&2
+    exit 1
+fi
+
 # The tag lands in the zip FILENAME and is the only thing distinguishing a
 # language artifact from the English one, so it must be boring.
 if [ -n "$LANG_TAG" ]; then
@@ -93,7 +120,7 @@ if [ -n "$LANG_TAG" ]; then
         echo "ERROR: EXALTED_LANG_TAG=$LANG_TAG requires EXALTED_SKIP_CET=1." >&2
         echo "       The CET surface reads cet/EXALTED/data/ and is English-only;" >&2
         echo "       packaging it with a $LANG_TAG browser payload would overwrite" >&2
-        echo "       $CET_ZIP and $CET_ONLY_ZIP with an untagged, mixed-language build." >&2
+        echo "       $UNIFIED_ZIP and $CET_ONLY_ZIP with an untagged, mixed-language build." >&2
         exit 1
     fi
 fi
@@ -113,6 +140,13 @@ fi
 # /b/<short> addresses valid across languages and lets a future multi-language
 # pack share one route space. This gate runs on EVERY build (English included),
 # so no language can bypass it.
+if [ "$MULTILANG" = "1" ]; then
+    # The combined tree ships suffixed ExaltedData<Sfx>.reds per language and one
+    # ExaltedLang.reds dispatcher, so the single-master gate above does not apply.
+    # verify_multilang.py enforces the SAME slug/canonical/route-safe guarantees
+    # per language, plus the cross-tree checks (dispatcher total, imports).
+    python3 "$REPO/scripts/verify_multilang.py" "$SITE_SRC/data" "$CANON_BOOKS" || exit 1
+else
 python3 - "$SITE_SRC/data" "$CANON_BOOKS" "${LANG_TAG:-en}" <<'PY' || exit 1
 import glob
 import json
@@ -259,6 +293,7 @@ if errors:
 print(f"  slug gate ok [{tag}]: {len(nums)} books, "
       f"{len(set(shorts.values()))} unique ASCII slugs, all canonical KJV")
 PY
+fi
 
 
 mkdir -p "$DIST"
@@ -372,11 +407,22 @@ if [ "$SKIP_CET" = "1" ]; then
     exit 0
 fi
 
-pack "$CET_ZIP" "bin" "r6"
+if [ "$MULTILANG" = "1" ]; then
+    # The All-in-One is the CET surface plus the multi-language browser site.
+    pack "$UNIFIED_ZIP" "bin" "r6"
+    pack "$BROWSER_MULTI_ZIP" "r6"
+    echo "Packed (All-in-One, multi-language):"
+    cat "$DIST/$UNIFIED_ZIP.sha256"
+    cat "$DIST/$BROWSER_MULTI_ZIP.sha256"
+    exit 0
+fi
+
+# Single-language build: CET (English-only) and the one browser language. The
+# All-in-One is emitted ONLY by the multi-language build above, so re-running the
+# English build can never clobber the All-in-One artifact.
 pack "$CET_ONLY_ZIP" "bin"
 pack "$BROWSER_ZIP" "r6"
 
 echo "Packed:"
-cat "$DIST/$CET_ZIP.sha256"
 cat "$DIST/$CET_ONLY_ZIP.sha256"
 cat "$DIST/$BROWSER_ZIP.sha256"

@@ -1,0 +1,464 @@
+[
+ {
+  "n": 1,
+  "name": "Rodzaju",
+  "short": "Gen",
+  "chapters": 50,
+  "verses": 1533
+ },
+ {
+  "n": 2,
+  "name": "Wyjścia",
+  "short": "Ex",
+  "chapters": 40,
+  "verses": 1213
+ },
+ {
+  "n": 3,
+  "name": "Kapłańska",
+  "short": "Lev",
+  "chapters": 27,
+  "verses": 859
+ },
+ {
+  "n": 4,
+  "name": "Liczb",
+  "short": "Num",
+  "chapters": 36,
+  "verses": 1288
+ },
+ {
+  "n": 5,
+  "name": "Powtórzonego Prawa",
+  "short": "Deut",
+  "chapters": 34,
+  "verses": 959
+ },
+ {
+  "n": 6,
+  "name": "Jozuego",
+  "short": "Josh",
+  "chapters": 24,
+  "verses": 658
+ },
+ {
+  "n": 7,
+  "name": "Sędziów",
+  "short": "Judg",
+  "chapters": 21,
+  "verses": 618
+ },
+ {
+  "n": 8,
+  "name": "Rut",
+  "short": "Ruth",
+  "chapters": 4,
+  "verses": 85
+ },
+ {
+  "n": 9,
+  "name": "1 Samuela",
+  "short": "1Sam",
+  "chapters": 31,
+  "verses": 810
+ },
+ {
+  "n": 10,
+  "name": "2 Samuela",
+  "short": "2Sam",
+  "chapters": 24,
+  "verses": 695
+ },
+ {
+  "n": 11,
+  "name": "1 Królewska",
+  "short": "1Kgs",
+  "chapters": 22,
+  "verses": 816
+ },
+ {
+  "n": 12,
+  "name": "2 Królewska",
+  "short": "2Kgs",
+  "chapters": 25,
+  "verses": 719
+ },
+ {
+  "n": 13,
+  "name": "1 Kronik",
+  "short": "1Chr",
+  "chapters": 29,
+  "verses": 942
+ },
+ {
+  "n": 14,
+  "name": "2 Kronik",
+  "short": "2Chr",
+  "chapters": 36,
+  "verses": 822
+ },
+ {
+  "n": 15,
+  "name": "Ezdrasza",
+  "short": "Ezra",
+  "chapters": 10,
+  "verses": 280
+ },
+ {
+  "n": 16,
+  "name": "Nehemiasza",
+  "short": "Neh",
+  "chapters": 13,
+  "verses": 406
+ },
+ {
+  "n": 17,
+  "name": "Estery",
+  "short": "Esth",
+  "chapters": 10,
+  "verses": 167
+ },
+ {
+  "n": 18,
+  "name": "Hioba",
+  "short": "Job",
+  "chapters": 42,
+  "verses": 1070
+ },
+ {
+  "n": 19,
+  "name": "Psalmów",
+  "short": "Ps",
+  "chapters": 150,
+  "verses": 2461
+ },
+ {
+  "n": 20,
+  "name": "Przysłów",
+  "short": "Prov",
+  "chapters": 31,
+  "verses": 915
+ },
+ {
+  "n": 21,
+  "name": "Kaznodziei Salomona",
+  "short": "Eccl",
+  "chapters": 12,
+  "verses": 222
+ },
+ {
+  "n": 22,
+  "name": "Pieśń nad Pieśniami",
+  "short": "Song",
+  "chapters": 8,
+  "verses": 117
+ },
+ {
+  "n": 23,
+  "name": "Izajasza",
+  "short": "Isa",
+  "chapters": 66,
+  "verses": 1292
+ },
+ {
+  "n": 24,
+  "name": "Jeremiasza",
+  "short": "Jer",
+  "chapters": 52,
+  "verses": 1364
+ },
+ {
+  "n": 25,
+  "name": "Lamentacje",
+  "short": "Lam",
+  "chapters": 5,
+  "verses": 154
+ },
+ {
+  "n": 26,
+  "name": "Ezechiela",
+  "short": "Ezek",
+  "chapters": 48,
+  "verses": 1273
+ },
+ {
+  "n": 27,
+  "name": "Daniela",
+  "short": "Dan",
+  "chapters": 12,
+  "verses": 357
+ },
+ {
+  "n": 28,
+  "name": "Ozeasza",
+  "short": "Hos",
+  "chapters": 14,
+  "verses": 197
+ },
+ {
+  "n": 29,
+  "name": "Joela",
+  "short": "Joel",
+  "chapters": 3,
+  "verses": 73
+ },
+ {
+  "n": 30,
+  "name": "Amosa",
+  "short": "Amos",
+  "chapters": 9,
+  "verses": 146
+ },
+ {
+  "n": 31,
+  "name": "Abdiasza",
+  "short": "Obad",
+  "chapters": 1,
+  "verses": 21
+ },
+ {
+  "n": 32,
+  "name": "Jonasza",
+  "short": "Jonah",
+  "chapters": 4,
+  "verses": 48
+ },
+ {
+  "n": 33,
+  "name": "Micheasza",
+  "short": "Mic",
+  "chapters": 7,
+  "verses": 105
+ },
+ {
+  "n": 34,
+  "name": "Nahuma",
+  "short": "Nah",
+  "chapters": 3,
+  "verses": 47
+ },
+ {
+  "n": 35,
+  "name": "Abakuka",
+  "short": "Hab",
+  "chapters": 3,
+  "verses": 56
+ },
+ {
+  "n": 36,
+  "name": "Sofoniasza",
+  "short": "Zeph",
+  "chapters": 3,
+  "verses": 53
+ },
+ {
+  "n": 37,
+  "name": "Aggeusza",
+  "short": "Hag",
+  "chapters": 2,
+  "verses": 38
+ },
+ {
+  "n": 38,
+  "name": "Zachariasza",
+  "short": "Zech",
+  "chapters": 14,
+  "verses": 211
+ },
+ {
+  "n": 39,
+  "name": "Malachiasza",
+  "short": "Mal",
+  "chapters": 4,
+  "verses": 55
+ },
+ {
+  "n": 40,
+  "name": "Mateusza",
+  "short": "Matt",
+  "chapters": 28,
+  "verses": 1071
+ },
+ {
+  "n": 41,
+  "name": "Marka",
+  "short": "Mark",
+  "chapters": 16,
+  "verses": 678
+ },
+ {
+  "n": 42,
+  "name": "Łukasza",
+  "short": "Luke",
+  "chapters": 24,
+  "verses": 1151
+ },
+ {
+  "n": 43,
+  "name": "Jana",
+  "short": "John",
+  "chapters": 21,
+  "verses": 879
+ },
+ {
+  "n": 44,
+  "name": "Dzieje Apostolskie",
+  "short": "Acts",
+  "chapters": 28,
+  "verses": 1007
+ },
+ {
+  "n": 45,
+  "name": "Rzymian",
+  "short": "Rom",
+  "chapters": 16,
+  "verses": 433
+ },
+ {
+  "n": 46,
+  "name": "1 Koryntian",
+  "short": "1Cor",
+  "chapters": 16,
+  "verses": 437
+ },
+ {
+  "n": 47,
+  "name": "2 Koryntian",
+  "short": "2Cor",
+  "chapters": 13,
+  "verses": 257
+ },
+ {
+  "n": 48,
+  "name": "Galatów",
+  "short": "Gal",
+  "chapters": 6,
+  "verses": 149
+ },
+ {
+  "n": 49,
+  "name": "Efezjan",
+  "short": "Eph",
+  "chapters": 6,
+  "verses": 155
+ },
+ {
+  "n": 50,
+  "name": "Filipian",
+  "short": "Phil",
+  "chapters": 4,
+  "verses": 104
+ },
+ {
+  "n": 51,
+  "name": "Kolosan",
+  "short": "Col",
+  "chapters": 4,
+  "verses": 95
+ },
+ {
+  "n": 52,
+  "name": "1 Tesaloniczan",
+  "short": "1Thess",
+  "chapters": 5,
+  "verses": 89
+ },
+ {
+  "n": 53,
+  "name": "2 Tesaloniczan",
+  "short": "2Thess",
+  "chapters": 3,
+  "verses": 47
+ },
+ {
+  "n": 54,
+  "name": "1 Tymoteusza",
+  "short": "1Tim",
+  "chapters": 6,
+  "verses": 113
+ },
+ {
+  "n": 55,
+  "name": "2 Tymoteusza",
+  "short": "2Tim",
+  "chapters": 4,
+  "verses": 83
+ },
+ {
+  "n": 56,
+  "name": "Tytusa",
+  "short": "Titus",
+  "chapters": 3,
+  "verses": 46
+ },
+ {
+  "n": 57,
+  "name": "Filemona",
+  "short": "Philem",
+  "chapters": 1,
+  "verses": 25
+ },
+ {
+  "n": 58,
+  "name": "Hebrajczyków",
+  "short": "Heb",
+  "chapters": 13,
+  "verses": 303
+ },
+ {
+  "n": 59,
+  "name": "Jakuba",
+  "short": "Jas",
+  "chapters": 5,
+  "verses": 108
+ },
+ {
+  "n": 60,
+  "name": "1 Piotra",
+  "short": "1Pet",
+  "chapters": 5,
+  "verses": 105
+ },
+ {
+  "n": 61,
+  "name": "2 Piotra",
+  "short": "2Pet",
+  "chapters": 3,
+  "verses": 61
+ },
+ {
+  "n": 62,
+  "name": "1 Jana",
+  "short": "1John",
+  "chapters": 5,
+  "verses": 105
+ },
+ {
+  "n": 63,
+  "name": "2 Jana",
+  "short": "2John",
+  "chapters": 1,
+  "verses": 13
+ },
+ {
+  "n": 64,
+  "name": "3 Jana",
+  "short": "3John",
+  "chapters": 1,
+  "verses": 14
+ },
+ {
+  "n": 65,
+  "name": "Judy",
+  "short": "Jude",
+  "chapters": 1,
+  "verses": 25
+ },
+ {
+  "n": 66,
+  "name": "Objawienie Jana",
+  "short": "Rev",
+  "chapters": 22,
+  "verses": 404
+ }
+]

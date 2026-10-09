@@ -1,0 +1,98 @@
+[font=Verdana][size=5][b]EXALTED TERMINAL 77 — an offline King James Bible in Cyberpunk 2077 (and your Linux terminal)[/b][/size][/font]
+
+[font=Verdana][size=3]The complete Holy Bible, fully local — [b]three independent surfaces from one public-domain dataset[/b]. Install any one, or all:[/size][/font]
+
+[font=Verdana][size=4][b]1. EXALTED TERMINAL[/b][/size][/font] [font=Verdana][size=3](CET, in-game)[/size][/font]
+[font=Verdana][size=3]A full-screen CRT terminal on a hotkey — browse any book and chapter, words of Christ in red, full-text search, a spaced-repetition memory deck and study notes, over a glass pane whose opacity you dial from the About tab (25–95%, saved).[/size][/font]
+[font=Verdana][size=3][list]
+[*]Hyperkey-first: [b]TAB[/b] cycles the panels (BOOKS → VERSES → SEARCH → MEMORY → NOTES → ABOUT); arrows navigate; 1–5 jump straight to a tab.
+[*]Open the CET Overlay and the terminal becomes fully interactive.
+[/list][/size][/font]
+
+[font=Verdana][size=4][b]2. EXALTED BROWSER SITE[/b][/size][/font] [font=Verdana][size=3](in-game web)[/size][/font]
+[font=Verdana][size=3]The same Bible as a website inside Night City's own browser. Power on any computer, open a browser, pick [b]Exalted Terminal 77[/b] from the site list or type the address:[/size][/font]
+[center][font=Consolas][size=4][code]NETdir://exalted.terminal[/code][/size][/font][/center]
+[font=Verdana][size=3][list]
+[*]Home → Library (66 books, 8/page) → Book (chapters, 10/page) → Reader (10 lines/page, chapter paging, previous/next).
+[*]Pure redscript: real in-game browser widgets, so links, hover states and paging behave like any other Night City site.
+[*][b]Language editions:[/b] Spanish (Reina-Valera 1909), Czech (Kralická 1613), Dutch (Statenvertaling), Russian (Synodal 1876) — native book names. One edition at a time (it replaces the data folder).
+[/list][/size][/font]
+
+[font=Verdana][size=4][b]3. EXALTED CLI[/b][/size][/font] [font=Verdana][size=3](standalone Linux)[/size][/font]
+[font=Verdana][size=3]The same Bible as a command-line reader — one static binary, KJV built in, no game and no network.[/size][/font]
+[font=Verdana][size=3][list]
+[*][code]exalted read "John 3:16"[/code] · [code]exalted search "loved the world"[/code] · [code]exalted terms stron[/code] (word frequencies/autocomplete) · run [code]exalted[/code] with no args for the interactive UI (read, search, memory deck, notes).
+[*]Notes and an SM-2 review deck persist in [code]~/.biblelearn[/code], with recoverable trash and [code]exalted backup[/code].
+[*]Import your own: [code]install-text[/code] (USFM/plain), [code]install-pdf[/code], optional Internet Archive fetch (public-domain versions only).
+[*][b]Your data stays yours[/b] — everything lives in one folder ([code]~/.biblelearn[/code], or [code]--data DIR[/code]): versions, notes, cards, indexes. Nothing is written anywhere else.
+[/list][/size][/font]
+
+[font=Verdana][size=4][b]Shared properties[/b][/size][/font]
+[font=Verdana][size=3][list]
+[*][b]66 books / 1189 chapters / 31102 verses[/b], 2028 red-letter verses (English).
+[*][b]Fully offline[/b] — no network, no external process, no companion service. Works on any OS. The public-domain KJV (1611 / Oxford 1769) is bundled as JSON and compiled into the game surfaces; the CLI carries it inside its binary. Your desktop Bible collection is never touched.
+[*][b]Clean text[/b] — the source's cross-reference apparatus, section markers and translator's notes are stripped at build time, so no stray glyphs reach the screen.
+[*][b]Independent[/b] — each surface ships separately and works without the others.
+[/list][/size][/font]
+
+[font=Verdana][size=4][b]Files[/b][/size][/font]
+[font=Verdana][size=3][list]
+[*][b]EXALTED_Terminal_77-AllInOne-0.1.5.zip[/b] — All-in-One: terminal + browser site, [b]all shipped languages[/b] (en, es, cze, deu, dut, pol). One install; switch language in-game at the address bar ([code]/es[/code], [code]/cze[/code], …).
+[*][b]EXALTED_Terminal_77-Browser-MultiLang-0.1.2.zip[/b] — browser site only, the same six languages (for players who do not use CET)
+[*][b]EXALTED_Terminal_77-CET-0.1.5.zip[/b] — terminal only
+[*][b]EXALTED_Terminal_77-Browser-0.1.2.zip[/b] — browser site, English KJV
+[*][b]EXALTED_Terminal_77-Browser-{es,cze,deu,dut,pol}-0.1.2.zip[/b] — browser site, that language edition
+[*][b]EXALTED_Terminal_77-CLI-0.2.1.zip[/b] — standalone Linux CLI (game not needed)
+[/list][/size][/font]
+
+[font=Verdana][size=4][b]Requirements & dependencies[/b][/size][/font]
+[font=Verdana][size=3][b]Game:[/b] Cyberpunk 2077 2.2 or newer (language editions: 2.31 or newer).[/size][/font]
+[font=Verdana][size=3][b]Terminal surface:[/b][list]
+[*][b]Cyber Engine Tweaks[/b] (CET) — [url=https://www.nexusmods.com/cyberpunk2077/mods/1079]Nexus 1079[/url]
+[*][b]RED4ext[/b] — [url=https://www.nexusmods.com/cyberpunk2077/mods/2066]Nexus 2066[/url]
+[/list][/size][/font]
+[font=Verdana][size=3][b]Browser surface:[/b][list]
+[*][b]Browser Extension Framework[/b] — [url=https://www.nexusmods.com/cyberpunk2077/mods/10038]Nexus 10038[/url] (0.9.7+). Without it the site is simply never listed — no error, just no page.
+[*]Its prerequisites: [b]redscript[/b] ([url=https://www.nexusmods.com/cyberpunk2077/mods/1740]Nexus 1740[/url]), [b]RED4ext[/b] (2066), [b]Codeware[/b] ([url=https://www.nexusmods.com/cyberpunk2077/mods/2096]Nexus 2096[/url]), [b]Input Loader[/b]. Optional: [b]Mod Settings[/b] (in-game toggle for the framework).
+[*][b]CET is NOT required[/b] for the browser surface — it is pure redscript, no Lua, no ImGui.
+[/list][/size][/font]
+[font=Verdana][size=3][b]CLI:[/b] Linux x86_64 only. Nothing else — the binary is statically linked (no libc/GL/OpenSSL packages), runs from a USB stick, and never uses the network unless you ask ([code]fetch-archive[/code] / [code]install-nkjv[/code]).[/size][/font]
+[font=Verdana][size=3][b]NOT required:[/b] ArchiveXL, TweakXL, or any network access. The two game surfaces do not need each other, and neither needs the CLI.[/size][/font]
+
+[font=Verdana][size=4][b]Install[/b][/size][/font]
+[font=Verdana][size=3][b]Terminal:[/b][list=1]
+[*]Unzip into your Cyberpunk 2077 folder (standard CET layout).
+[*]CET Overlay → Bindings → bind a key for [i]Open EXALTED Terminal[/i].
+[*]Press the key to show it; open the CET Overlay (default Ctrl+Tab) to hand input to the mod.
+[/list][/size][/font]
+[font=Verdana][size=3][b]Browser site:[/b][list=1]
+[*]Unzip into your Cyberpunk 2077 folder — it lands at [code]r6/scripts/EXALTED/[/code].
+[*][b]Fully restart the game[/b] — redscript compiles on launch; a script reload is not enough.
+[*]Open any computer's browser and pick [b]Exalted Terminal 77[/b], or type [code]NETdir://exalted.terminal[/code].
+[/list][/size][/font]
+[font=Verdana][size=3][b]CLI:[/b][list=1]
+[*][code]unzip EXALTED_Terminal_77-CLI-0.2.1.zip -d exalted-cli && cd exalted-cli[/code]
+[*][code]chmod +x exalted[/code] (optional: copy to [code]~/.local/bin[/code]).
+[*][code]exalted read "John 3:16"[/code] — the first run seeds the KJV into [code]~/.biblelearn[/code] (offline, a few seconds). After upgrading from 0.2.0, run [code]exalted index[/code] once.
+[/list][/size][/font]
+
+[font=Verdana][size=4][b]Troubleshooting[/b][/size][/font]
+[font=Verdana][size=3][list]
+[*]Terminal ignores the keyboard → the CET Overlay is closed. Open it to hand input to the mod.
+[*]Site missing from the browser list → Browser Extension Framework not installed, or the game was not fully restarted.
+[*]Game will not start / redscript errors → check [code]Cyberpunk 2077\r6\logs\redscript_rCURRENT.log[/code]. It is almost always a framework or Codeware version behind your game patch.
+[*]CLI "Permission denied" → [code]chmod +x exalted[/code]. "command not found" → use [code]./exalted[/code] or fix your PATH.
+[/list][/size][/font]
+
+[font=Verdana][size=4][b]Changelog[/b][/size][/font]
+[font=Verdana][size=3][list]
+[*][b]CLI 0.2.1[/b] — indexing fix: search results, term frequencies and the UI show clean scripture instead of leftover USFM markup. Run [code]exalted index[/code] once after upgrading; stored scripture is unchanged.
+[*][b]0.1.5 / browser 0.1.2[/b] — text cleanup: the USFM section marker ("¶") that prefixed 2970 verses across 42 books, and the 369 dangling colons left by removed cross-reference notes, are now stripped. Added language editions (es/cze/dut/rus).
+[*][b]0.1.4 / browser 0.1.1[/b] — cross-reference and margin notes stripped from the Bible text on both surfaces.
+[*][b]0.1.3 / browser 0.1.0[/b] — terminal reader improvements; the full KJV added to the in-game browser.
+[/list][/size][/font]
+
+[font=Verdana][size=4][b]Credits / License[/b][/size][/font]
+[font=Verdana][size=3]Bible text: King James Version 1611 / Oxford 1769 — [i]public domain[/i] (Project Gutenberg; Crosswire/eBible.org). Language editions are public domain (RV1909, Kralická 1613, Statenvertaling, Synodal 1876). No copyrighted modern-spelling edition is used. CET (MIT), Dear ImGui (MIT) and Browser Extension Framework, RED4ext, Codeware, redscript, Input Loader and Mod Settings are used only through their public APIs — no framework source is bundled. All other code (Lua mod, redscript site, data generator, exporter, CLI, scripts and docs) is original. Full provenance: [b]docs/CREDITS.md[/b].[/size][/font]
+
+[font=Verdana][size=3][b]Source[/b] — [url=https://github.com/Gigatone77]Gigatone77[/url][/size][/font]

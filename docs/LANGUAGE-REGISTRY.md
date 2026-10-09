@@ -59,8 +59,45 @@ Consequences recorded in this file:
 
 | code | Language | English name | Version / edition | Tradition | Rights verdict + evidence (✅=clear, 🟠=judgement call, 🔴=blocked) | Canonical source | sha256 | Converter format | Build status | Artifact | Blockers |
 |---|---|---|---|---|---|---|---|---|---|---|---|
-| `en` | English | English | King James Version 1611 / Oxford 1769 | Protestant / Anglican | **PD — stated in-repo.** `docs/nexus-description.bbcode.txt:82` credits "Project Gutenberg; Crosswire/eBible.org"; NKJV (© Thomas Nelson) is explicitly **not** used | `cet/EXALTED/data/kjv/*.json` (canonical, 66 files) | see §9 note | in-repo exporter (`scripts/`) | SHIPPED, all three surfaces | `EXALTED_Terminal_77-0.1.5.zip` `2b46a4687f5757add3261098c0d2de63b11c31fe6199aa6d8a4ea60a1a90bc47`<br>`EXALTED_Terminal_77-CET-0.1.5.zip` `d94e00183ec66d6a940f0251e9e03bc84266073e00fb0c2775ff06a9f8df1c4f`<br>`EXALTED_Terminal_77-Browser-0.1.2.zip` `f2f955ac2ea8a17db0f2ee5c047227246058d542bda51d7e4d8960398507cc2f` | in-game render test never run |
+| `en` | English | English | King James Version 1611 / Oxford 1769 | Protestant / Anglican | **PD — stated in-repo.** `docs/nexus-description.bbcode.txt:82` credits "Project Gutenberg; Crosswire/eBible.org"; NKJV (© Thomas Nelson) is explicitly **not** used | `cet/EXALTED/data/kjv/*.json` (canonical, 66 files) | see §9 note | in-repo exporter (`scripts/`) | SHIPPED, all three surfaces | `EXALTED_Terminal_77-AllInOne-0.1.5.zip` `99a927523616eaf0940ea9291c6087592ac223f861f2425b8ff778c27685c094` (**now the ONE multi-language mod: CET 0.1.5 + the browser site for en, es, cze, deu, dut, pol; runtime `/`-code switch**)<br>`EXALTED_Terminal_77-Browser-MultiLang-0.1.2.zip` `c5b1451e05ee3c37a1ee7e32d65d054d6233e0b6125f348227fa49b5167f4fc0` (browser site only, same six languages)<br>`EXALTED_Terminal_77-CET-0.1.5.zip` `fba32fb74032f697b9dcc59227836ff88015512eb5fae6c7de7fade570bb9fce`<br>`EXALTED_Terminal_77-Browser-0.1.2.zip` `2eb996b7adde4d8f583d853abf1d6e0d98f46cf25a41b64dd233141997acd9ca` (English) | in-game render test never run |
 | `es` | Spanish | Spanish | **Reina-Valera 1909** (printed PDF) | Protestant | **PD — verified by orthographic fingerprint**, not by an imprint (the PDF has none). `fué`×1733, `á` preposition×18977, `Jehová`×6782, `vosotros`×1652, `ustedes`×0. Full argument: `docs/RV1909-SOURCE.md` | printed PDF `Documents/20/Bibles/Spanish.zip` | `1d8545c59c5c77debce3654f7a4641a79a83bc0db03490af197fccf683b4507d` | PDF → `scripts/rv1909/build_es_from_pdf.py` | SHIPPED, **browser only** | `EXALTED_Terminal_77-Browser-es-0.1.2.zip`<br>`d108256cae1151e3dd60b8b08429128668ce4ddb1dbf5e1b3548be2ce1e29acf` | ① **Spanish `Site.reds` chrome still English.** ② **Spanish CET surface does not exist** (English only). ③ in-game render test still owed. ④ 1,454 OCR-class wording defects shipped as-is + ledger (`scripts/rv1909/es-variants.tsv`) |
+
+> **Correction 2026-10-09:** the `en` row's artifact hashes were **stale** (they
+> predated the Oct 6 rebuild) and are refreshed above against the staged zips;
+> the unified zip was renamed `EXALTED_Terminal_77-0.1.5.zip` →
+> `EXALTED_Terminal_77-AllInOne-0.1.5.zip`. Re-verify with
+> `sha256sum -c` in the staging dir before any upload.
+>
+> **Correction 2026-10-09 (b):** the All-in-One is now the ONE **multi-language**
+> mod (user directive: "all-in-one is not multiple mods, it is one mod with all
+> of the languages"). It ships the CET surface plus a **combined** browser tree
+> built by `scripts/langify.py` — `r6/scripts/EXALTED/data/ExaltedLang.reds`
+> dispatches six per-language modules (`ExaltedData{En,Es,Cze,Deu,Dut,Pol}`),
+> selected at runtime by the NETdir address (`/es`, `/cze`, …; bare address =
+> English). The old English-only combo of the same version is preserved at
+> `_superseded/EXALTED_Terminal_77-AllInOne-0.1.5.english-combo.zip`
+> (`4f7185f7…`) and in `~/gt77-backups/exalted/20261009-allinone-english-pre/`.
+> The six per-language browser zips are unchanged (they still ship the
+> single-language `Site.reds`); only English is user-verified, the other five
+> share the identical generated structure, so they are trusted by construction
+> (`docs/MULTILANG-WIP-20261004.md`).
+>
+> **Correction 2026-10-09 (c):** `deu` and `pol` no longer fall back to English
+> book names. Their source builds carried `native_names: 0` (deu: OSIS with no
+> headings; pol: its JSON lists English book names itself), so native display
+> names were supplied — German per **Luther 1912** (`1. Mose … Offenbarung`) and
+> Polish per **Biblia Gdańska** (`Rodzaju … Objawienie Jana`) — into
+> `bible-sources/build/{deu,pol}/books.json` + `translations/{deu,pol}/books.json`
+> (canonical KJV `short` slugs untouched, asserted). Their standalone browser
+> zips were rebuilt and the multi-language pack regenerated:
+> `Browser-deu-0.1.2.zip` `cb9ce9ff68d80f4dac9ae2a20b35e7e864a08ee19a053a4b403ae16b86cc7652`,
+> `Browser-pol-0.1.2.zip` `805dd2cd4464498f0cc87ce4fdfaf3600fe22be888681c2f32910af335e18b3e`;
+> All-in-One `99a92752…`, Browser-MultiLang `c5b1451e…` (above). The previous
+> English-named deu/pol zips are stashed at `_superseded/…english-names.zip`;
+> build metadata backed up in
+> `~/gt77-backups/exalted/20261009-deu-pol-native-names-pre/`. `swe` still ships
+> English names (its rebuild status is separately unresolved) and `heb` is still
+> rejected (§6).
 
 English + Spanish are the only languages with a **user sign-off on the version**
 (plan constraint C4).
@@ -81,12 +118,14 @@ built 2026-10-05, staged 2026-10-06 in `dist/`,
 moved out of the upload staging root into `_superseded/` on 2026-10-08 (move,
 never rm) so it cannot be uploaded by accident. Localized `DESCRIPTION-…` /
 `INSTALL-…` text exists
-for `en`, `es` and — written 2026-10-08 — `cze dut rus`; the other four are
-held: `deu pol swe` on English book names (§4b), `heb` on §6.
+for `en`, `es` and — written 2026-10-08 — `cze dut rus`; the remaining ones are
+held: `swe` on English book names (§4b), `heb` on §6. (`deu` and `pol` were
+held on English names too but were **resolved 2026-10-09** — see note (c) — and
+now ship native headings.)
 
 Book names above were verified **from the staged zips themselves**
 (`r6/scripts/EXALTED/data/ExaltedData.reds`), not from the build reports:
-native = `cze dut rus heb`; English fallback = `deu pol swe`. `rus` is
+native = `cze dut rus heb deu pol`; English fallback = `swe` only. `rus` is
 package-ready on names but still carries the §7 font blocker (`Site.reds`
 hardcodes `raj.inkfontfamily`), so its INSTALL discloses the risk.
 
@@ -117,6 +156,12 @@ verses. `pol` is the 13th and fails **differently** — its source JSON lists th
 books in English itself, so no converter can recover Polish names from it
 (needs either a Polish heading list supplied alongside, or the sibling
 `raw/pol-gdanska.osis.xml`).
+
+**RESOLVED 2026-10-09 for `deu` and `pol`** (note (c)): native heading lists
+were supplied (Luther 1912 / Biblia Gdańska), the builds and standalone zips
+rebuilt, and both now ship in the multi-language pack. The `deu`/`pol` rows
+below are therefore historical; the heading blocker is cleared. `swe` and the
+other entries in this table remain unresolved.
 
 | code | Language | English name | Version / edition (declared) | Tradition | Rights verdict + evidence | Canonical source | sha256 (raw) | Format | ch / verses | flags | zip bytes | Blockers |
 |---|---|---|---|---|---|---|---|---|---|---|---|

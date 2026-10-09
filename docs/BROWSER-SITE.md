@@ -8,8 +8,8 @@ browser. No CET, no Lua.
 
 ## Install
 
-Unzip `EXALTED_Terminal_77-Browser-0.1.1.zip` (or the unified
-`EXALTED_Terminal_77-0.1.4.zip`) into the game root — it lands at
+Unzip `EXALTED_Terminal_77-Browser-0.1.2.zip` (or the All-in-One
+`EXALTED_Terminal_77-AllInOne-0.1.5.zip`) into the game root — it lands at
 `r6/scripts/EXALTED/`. Requires the Browser Extension Framework already
 installed (`r6/scripts/BrowserExtension/`). Redscript compiles on game
 launch (full game restart required, not just reload).
@@ -18,6 +18,23 @@ You browse to the site from any in-game browser: address
 `NETdir://exalted.terminal`, title **Exalted Terminal 77** (zetatech1 icon).
 The site appears on the browser's site list when the player powers on a
 computer with a browser app.
+
+### Multi-language (one mod, all languages)
+
+The All-in-One and `…-Browser-MultiLang-…` builds ship a **combined** tree: one
+site, six languages. `r6/scripts/EXALTED/data/ExaltedLang.reds` dispatches the
+per-language modules (`ExaltedData{En,Es,Cze,Deu,Dut,Pol}.reds`), and the
+language is carried in the address (stateless, so it survives navigation):
+
+- `NETdir://exalted.terminal` — English (default)
+- `NETdir://exalted.terminal/es`, `/cze`, `/deu`, `/dut`, `/pol` — that language
+- `NETdir://exalted.terminal/lang` — in-game language picker
+
+All languages share the **same ASCII slug route space** (`/b/<short>`,
+`/r/<short>/<ch>:<vp>`), so a bookmark resolves in every language. The combined
+tree is built by `scripts/langify.py` (names only are rewritten; the `s"…"`
+literals are copied byte-for-byte from the verified per-language trees) and
+gated by `scripts/verify_multilang.py`. See `docs/MULTILANG-WIP-20261004.md`.
 
 > Fallback: if the Browser Extension Framework is NOT installed, the whole
 > `ExaltedSite` listener falls back to a no-op stub so the file still
@@ -114,4 +131,4 @@ callback (`EXAL_OnLinkClicked`) routes via `NameToString(w.GetName())` →
 Independent: the CET terminal (`bin/x64/…/mods/EXALTED/`) and this
 redscript site (`r6/scripts/EXALTED/`) share the same JSON source
 (`cet/EXALTED/data`) but ship separately, so each works without the other.
-Generate both from one dataset; the unified zip simply contains both trees.
+Generate both from one dataset; the All-in-One zip simply contains both trees.
