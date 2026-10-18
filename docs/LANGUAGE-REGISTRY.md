@@ -76,7 +76,7 @@ Consequences recorded in this file:
 > selected at runtime by the NETdir address (`/es`, `/cze`, …; bare address =
 > English). The old English-only combo of the same version is preserved at
 > `_superseded/EXALTED_Terminal_77-AllInOne-0.1.5.english-combo.zip`
-> (`4f7185f7…`) and in `~/gt77-backups/exalted/20261009-allinone-english-pre/`.
+> (`4f7185f7…`).
 > The six per-language browser zips are unchanged (they still ship the
 > single-language `Site.reds`); only English is user-verified, the other five
 > share the identical generated structure, so they are trusted by construction
@@ -93,9 +93,8 @@ Consequences recorded in this file:
 > `Browser-deu-0.1.2.zip` `cb9ce9ff68d80f4dac9ae2a20b35e7e864a08ee19a053a4b403ae16b86cc7652`,
 > `Browser-pol-0.1.2.zip` `805dd2cd4464498f0cc87ce4fdfaf3600fe22be888681c2f32910af335e18b3e`;
 > All-in-One `99a92752…`, Browser-MultiLang `c5b1451e…` (above). The previous
-> English-named deu/pol zips are stashed at `_superseded/…english-names.zip`;
-> build metadata backed up in
-> `~/gt77-backups/exalted/20261009-deu-pol-native-names-pre/`. `swe` still ships
+> English-named deu/pol zips are stashed at `_superseded/…english-names.zip`
+> (build-metadata backup DELETED 2026-10-09). `swe` still ships
 > English names (its rebuild status is separately unresolved) and `heb` is still
 > rejected (§6).
 
